@@ -1,0 +1,7 @@
+<h3>Create Warehouse</h3>
+
+<input class="form-control mb-3" placeholder="Name" [(ngModel)]="warehouse.name">
+<input class="form-control mb-3" placeholder="Location" [(ngModel)]="warehouse.location">
+<input type="number" class="form-control mb-3" placeholder="Capacity" [(ngModel)]="warehouse.capacity">
+
+<button class="btn btn-primary" (click)="saveWarehouse()">Save</button>

@@ -1,0 +1,27 @@
+<h3>Create Hub</h3>
+
+<div class="card p-3">
+
+  <input
+    class="form-control mb-3"
+    placeholder="Hub Name"
+    [(ngModel)]="hub.name">
+
+  <input
+    class="form-control mb-3"
+    placeholder="City"
+    [(ngModel)]="hub.city">
+
+  <select
+    class="form-control mb-3"
+    [(ngModel)]="hub.status">
+    <option value="">Select Status</option>
+    <option value="Active">Active</option>
+    <option value="Inactive">Inactive</option>
+  </select>
+
+  <button class="btn btn-primary" (click)="saveHub()">
+    Save Hub
+  </button>
+
+</div>

@@ -1,0 +1,34 @@
+<div class="auth-page">
+  <div class="auth-overlay">
+    <div class="auth-card">
+
+      <h3 class="text-center mb-4">Login</h3>
+
+      <input
+        type="email"
+        class="form-control mb-3"
+        placeholder="Email Address"
+        [(ngModel)]="user.email">
+
+      <input
+        type="password"
+        class="form-control mb-4"
+        placeholder="Password"
+        [(ngModel)]="user.password">
+
+      <button
+        class="btn btn-success w-100"
+        (click)="login()">
+        Login
+      </button>
+
+     <p class="text-center mt-3 mb-0">
+  New user?
+  <a routerLink="/register" class="text-primary fw-bold" style="cursor:pointer;">
+    Register
+  </a>
+</p>
+
+    </div>
+  </div>
+</div>

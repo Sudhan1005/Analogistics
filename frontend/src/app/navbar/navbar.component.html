@@ -1,0 +1,55 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+  <a class="navbar-brand">Analogistics</a>
+
+  <ul class="navbar-nav me-auto">
+
+    <!-- Warehouses Dropdown -->
+    <li class="nav-item dropdown">
+      <a
+        class="nav-link dropdown-toggle"
+        role="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false">
+        Warehouses
+      </a>
+
+      <ul class="dropdown-menu">
+        <li>
+          <a class="dropdown-item" routerLink="/dashboard/warehouses">
+            Warehouse List
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item" routerLink="/dashboard/warehouses/create">
+            Create Warehouse
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <!-- Hubs Dropdown -->
+    <li class="nav-item dropdown">
+      <a
+        class="nav-link dropdown-toggle"
+        role="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false">
+        Hubs
+      </a>
+
+      <ul class="dropdown-menu">
+        <li>
+          <a class="dropdown-item" routerLink="/dashboard/hubs">
+            Hub List
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item" routerLink="/dashboard/hubs/create">
+            Create Hub
+          </a>
+        </li>
+      </ul>
+    </li>
+
+  </ul>
+</nav>

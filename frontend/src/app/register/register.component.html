@@ -1,0 +1,47 @@
+<div class="auth-page">
+  <div class="auth-overlay">
+    <div class="auth-card">
+
+      <h3 class="text-center mb-4">Create Account</h3>
+
+      <input
+        class="form-control mb-3"
+        placeholder="Full Name"
+        [(ngModel)]="user.name">
+
+      <input
+        type="email"
+        class="form-control mb-3"
+        placeholder="Email Address"
+        [(ngModel)]="user.email">
+
+      <input
+        type="password"
+        class="form-control mb-3"
+        placeholder="Password"
+        [(ngModel)]="user.password">
+
+      <input
+        class="form-control mb-3"
+        placeholder="Recovery Question"
+        [(ngModel)]="user.recovery_question">
+
+      <input
+        class="form-control mb-4"
+        placeholder="Recovery Answer"
+        [(ngModel)]="user.recovery_answer">
+
+      <button
+        class="btn btn-primary w-100"
+        (click)="register()">
+        Register
+      </button>
+
+      <p class="text-center mt-3 mb-0">
+        Already registered?
+        <a routerLink="/login" class="text-primary fw-bold">Login</a>
+      </p>
+
+    </div>
+  </div>
+</div>
