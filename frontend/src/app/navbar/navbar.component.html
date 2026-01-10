@@ -1,55 +1,60 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+
   <a class="navbar-brand">Analogistics</a>
 
   <ul class="navbar-nav me-auto">
 
-    <!-- Warehouses Dropdown -->
     <li class="nav-item dropdown">
-      <a
-        class="nav-link dropdown-toggle"
-        role="button"
-        data-bs-toggle="dropdown"
-        aria-expanded="false">
+      <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
         Warehouses
       </a>
-
       <ul class="dropdown-menu">
         <li>
-          <a class="dropdown-item" routerLink="/dashboard/warehouses">
+          <a class="dropdown-item"
+             routerLink="/dashboard/warehouses">
             Warehouse List
           </a>
         </li>
         <li>
-          <a class="dropdown-item" routerLink="/dashboard/warehouses/create">
+          <a class="dropdown-item"
+             routerLink="/dashboard/warehouses/create">
             Create Warehouse
           </a>
         </li>
       </ul>
     </li>
 
-    <!-- Hubs Dropdown -->
     <li class="nav-item dropdown">
-      <a
-        class="nav-link dropdown-toggle"
-        role="button"
-        data-bs-toggle="dropdown"
-        aria-expanded="false">
-        Hubs
+      <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+        Zones
       </a>
-
       <ul class="dropdown-menu">
         <li>
-          <a class="dropdown-item" routerLink="/dashboard/hubs">
-            Hub List
+          <a class="dropdown-item"
+             routerLink="/dashboard/zones">
+            Zone List
           </a>
         </li>
         <li>
-          <a class="dropdown-item" routerLink="/dashboard/hubs/create">
-            Create Hub
+          <a class="dropdown-item"
+             routerLink="/dashboard/zones/create">
+            Create Zone
           </a>
         </li>
       </ul>
     </li>
+   <li class="nav-item">
+      <a class="nav-link" routerLink="/dashboard/products/create">
+        Product Entry
+      </a>
+    </li>
 
   </ul>
+  
+
+  <button class="btn btn-outline-light ms-auto"
+          (click)="logout()">
+    Logout
+  </button>
+
 </nav>

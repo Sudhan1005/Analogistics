@@ -3,6 +3,125 @@ html, body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
 }
+body {
+  background: none;
+}
+.dashboard-bg {
+  min-height: 100vh;
+  background-image: url('/assets/images/warehouse-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Full-page background wrapper */
+.warehouse-bg {
+  position: relative;
+  min-height: 100vh; /* ✅ FULL SCREEN */
+  width: 100%;
+  background-image: url('/assets/images/warehouse-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Dark overlay */
+.warehouse-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 1;
+  pointer-events: none;   /* ✅ ALLOW CLICKS THROUGH */
+}
+
+/* Content layer */
+.warehouse-content {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  padding: 80px 0 40px; /* top padding for navbar */
+}
+
+/* White card */
+.warehouse-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 24px;
+}
+/* ================================
+   ZONES CREATE PAGE STYLES
+================================ */
+
+.zones-create-bg {
+  min-height: 100vh;
+  width: 100%;
+  background-image: url('/assets/images/warehouse-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Centered form card */
+.zones-create-card {
+  background: rgba(255, 255, 255, 0.97);
+  padding: 30px;
+  width: 100%;
+  max-width: 520px;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
+
+/* Input height consistency */
+.zones-create-card .form-control,
+.zones-create-card .form-select {
+  height: 48px;
+  font-size: 15px;
+}
+
+/* =========================
+   ZONES LIST BACKGROUND
+========================= */
+
+.zones-list-bg {
+  min-height: 100vh;
+  width: 100%;
+  background-image: url('/assets/images/warehouse-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 20px;
+}
+
+/* Zones list card (table container) */
+.zones-list-card {
+  background-color: #ffffff;   /* IMPORTANT */
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Table header fix */
+.zones-list-card .table thead th {
+  background-color: #0d6efd;   /* Bootstrap primary */
+  color: #ffffff;
+  border: none;
+}
+
+/* Table rows */
+.zones-list-card .table tbody tr {
+  background-color: #ffffff;
+}
+
+/* Remove unwanted dark overlays */
+.zones-list-bg * {
+  filter: none !important;
+  backdrop-filter: none !important;
+}
+
 
 /* Background container */
 .auth-page {
@@ -44,7 +163,10 @@ html, body {
   height: 45px;
   font-size: 15px;
 }
-
+nav.navbar {
+  position: relative;
+  z-index: 1000;  /* ✅ ABOVE BACKGROUND */
+}
 /* Buttons */
 .auth-card button {
   height: 45px;

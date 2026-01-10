@@ -1,7 +1,99 @@
-<h3>Create Warehouse</h3>
+<div class="warehouse-bg">
+  <div class="warehouse-content">
 
-<input class="form-control mb-3" placeholder="Name" [(ngModel)]="warehouse.name">
-<input class="form-control mb-3" placeholder="Location" [(ngModel)]="warehouse.location">
-<input type="number" class="form-control mb-3" placeholder="Capacity" [(ngModel)]="warehouse.capacity">
+    <div class="container d-flex justify-content-center">
 
-<button class="btn btn-primary" (click)="saveWarehouse()">Save</button>
+      <div class="warehouse-card shadow w-100" style="max-width: 650px;">
+
+        <h3 class="text-center mb-4">Create Warehouse</h3>
+
+        <!-- Warehouse Name -->
+        <div class="mb-3">
+          <label class="form-label">Warehouse Name</label>
+          <input
+            class="form-control"
+            [(ngModel)]="warehouse.name">
+        </div>
+
+        <!-- Location -->
+        <div class="mb-3">
+          <label class="form-label">Location</label>
+          <input
+            class="form-control"
+            [(ngModel)]="warehouse.location">
+        </div>
+
+        <!-- Capacity -->
+        <div class="mb-3">
+          <label class="form-label">Capacity</label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="warehouse.capacity">
+        </div>
+
+        <!-- Category -->
+        <div class="mb-3">
+          <label class="form-label">Category</label>
+          <select
+            class="form-select"
+            [(ngModel)]="warehouse.category">
+            <option value="">Select</option>
+            <option *ngFor="let c of categories" [value]="c">
+              {{ c }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Status -->
+        <div class="mb-3">
+          <label class="form-label">Status</label>
+          <select
+            class="form-select"
+            [(ngModel)]="warehouse.status">
+            <option value="">Select</option>
+            <option *ngFor="let s of statuses" [value]="s">
+              {{ s }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Transportation -->
+        <div class="mb-4">
+          <label class="form-label">Transportation Types</label>
+
+          <div
+            class="form-check"
+            *ngFor="let t of transportTypes">
+
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [value]="t"
+              (change)="
+                $event.target.checked
+                ? warehouse.transportation_types.push(t)
+                : warehouse.transportation_types.splice(
+                    warehouse.transportation_types.indexOf(t), 1
+                  )
+              ">
+
+            <label class="form-check-label">
+              {{ t }}
+            </label>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button
+          class="btn btn-primary w-100"
+          (click)="saveWarehouse()">
+          Save Warehouse
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>

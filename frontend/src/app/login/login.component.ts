@@ -25,13 +25,19 @@ export class LoginComponent {
   private auth: AuthService,
   private router: Router
 ) {}
-
-  login() {
+ngOnInit() {
+  if (this.auth.isLoggedIn()) {
+    this.router.navigate(['/dashboard']);
+  }
+}
+login() {
   this.auth.login(this.user).subscribe({
     next: () => {
+      this.auth.setLogin();
+      this.auth.setFullAccessUser();   // ✅ GIVE ACCESS
       this.router.navigate(['/dashboard/warehouses']);
     },
-    error: () => alert('Invalid email or password')
+    error: () => alert('Invalid credentials')
   });
 }
 }

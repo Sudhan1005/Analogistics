@@ -1,0 +1,88 @@
+<div class="warehouse-bg">
+  <div class="warehouse-content">
+
+    <div class="container d-flex justify-content-center">
+
+      <div class="warehouse-card shadow w-100" style="max-width: 750px;">
+
+        <h3 class="text-center mb-4">Product Entry</h3>
+
+        <!-- Warehouse -->
+        <div class="mb-3">
+          <label class="form-label">Warehouse</label>
+          <select class="form-select" [(ngModel)]="product.warehouse_id">
+            <option value="">Select Warehouse</option>
+            <option *ngFor="let w of warehouses" [value]="w.id">
+              {{ w.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Product Name -->
+        <div class="mb-3">
+          <label class="form-label">Product Name</label>
+          <input class="form-control" [(ngModel)]="product.product_name">
+        </div>
+
+        <!-- Product Type -->
+        <div class="mb-3">
+          <label class="form-label">Product Type</label>
+          <input class="form-control" [(ngModel)]="product.product_type">
+        </div>
+
+        <!-- Product Category -->
+        <div class="mb-3">
+          <label class="form-label">Product Category</label>
+          <input class="form-control" [(ngModel)]="product.product_category">
+        </div>
+
+        <!-- Quantity -->
+        <div class="mb-3">
+          <label class="form-label">Quantity</label>
+          <input type="number" class="form-control" [(ngModel)]="product.quantity">
+        </div>
+
+        <!-- Order Date & Time -->
+        <div class="row mb-3">
+          <div class="col">
+            <label class="form-label">Order Date</label>
+            <input type="date" class="form-control" [(ngModel)]="product.order_date">
+          </div>
+          <div class="col">
+            <label class="form-label">Order Time</label>
+            <input type="time" class="form-control" [(ngModel)]="product.order_time">
+          </div>
+        </div>
+
+        <!-- Delivery Date & Time -->
+        <div class="row mb-3">
+          <div class="col">
+            <label class="form-label">Delivery Date</label>
+            <input type="date" class="form-control" [(ngModel)]="product.delivery_date">
+          </div>
+          <div class="col">
+            <label class="form-label">Delivery Time</label>
+            <input type="time" class="form-control" [(ngModel)]="product.delivery_time">
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div class="mb-4">
+          <label class="form-label">Status</label>
+          <select class="form-select" [(ngModel)]="product.status">
+            <option value="">Select Status</option>
+            <option *ngFor="let s of statuses">{{ s }}</option>
+          </select>
+        </div>
+
+        <!-- Submit -->
+        <button class="btn btn-primary w-100" (click)="saveProduct()">
+          Save Product Entry
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>

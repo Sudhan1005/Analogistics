@@ -14,8 +14,15 @@ export class WarehouseCreateComponent {
   warehouse = {
     name: '',
     location: '',
-    capacity: null
+    capacity: null,
+    category: '',
+    status: '',
+    transportation_types: [] as string[]
   };
+
+  categories = ['Cold Storage', 'Dry Storage', 'Distribution Center'];
+  statuses = ['Active', 'Inactive', 'Under Maintenance'];
+  transportTypes = ['Road', 'Rail', 'Air', 'Sea'];
 
   constructor(
     private dataService: DataService,
@@ -26,7 +33,7 @@ export class WarehouseCreateComponent {
     this.dataService.createWarehouse(this.warehouse).subscribe({
       next: () => {
         alert('Warehouse created successfully');
-        this.router.navigate(['/dashboard/warehouses']); // ✅ GO TO LIST
+        this.router.navigate(['/dashboard/warehouses']);
       },
       error: (err) => {
         console.error(err);

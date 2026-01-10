@@ -10,176 +10,204 @@ CORS(app)
 @app.route("/api/register", methods=["POST"])
 def register():
     data = request.json
-    name = data["name"]
-    email = data["email"]
-    password = generate_password_hash(data["password"])
-    question = data["recovery_question"]
-    answer = generate_password_hash(data["recovery_answer"])
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # 🔍 Check duplicate email or name
     cursor.execute("""
         SELECT id FROM register_users 
         WHERE email = %s OR name = %s
-    """, (email, name))
+    """, (data["email"], data["name"]))
 
-    existing_user = cursor.fetchone()
+    if cursor.fetchone():
+        return jsonify({"message": "User already exists"}), 409
 
-    if existing_user:
-        return jsonify({
-            "message": "User already exists with this email or name"
-        }), 409   # HTTP 409 Conflict
-
-    # ✅ Insert new user
     cursor.execute("""
-        INSERT INTO register_users 
+        INSERT INTO register_users
         (name, email, password, recovery_question, recovery_answer)
         VALUES (%s, %s, %s, %s, %s)
-    """, (name, email, password, question, answer))
+    """, (
+        data["name"],
+        data["email"],
+        generate_password_hash(data["password"]),
+        data["recovery_question"],
+        generate_password_hash(data["recovery_answer"])
+    ))
 
     conn.commit()
     cursor.close()
     conn.close()
 
     return jsonify({"message": "User registered successfully"}), 201
+
+
 # ---------------- LOGIN ----------------
 @app.route("/api/login", methods=["POST"])
 def login():
     data = request.json
-    email = data.get("email")
-    password = data.get("password")
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute(
         "SELECT * FROM register_users WHERE email = %s",
-        (email,)
+        (data["email"],)
     )
-    user = cursor.fetchone()
 
+    user = cursor.fetchone()
     cursor.close()
     conn.close()
 
-    if user and check_password_hash(user["password"], password):
-        return jsonify({
-            "message": "Login successful",
-            "name": user["name"],
-            "email": user["email"]
-        }), 200
-    else:
-        return jsonify({
-            "message": "Invalid email or password"
-        }), 401
+    if user and check_password_hash(user["password"], data["password"]):
+        return jsonify({"message": "Login successful"}), 200
 
-# ---------------- FORGOT PASSWORD ----------------
-@app.route("/api/forgot-password", methods=["POST"])
-def forgot_password():
-    data = request.json
-    email = data["email"]
-    answer = data["recovery_answer"]
-    new_password = generate_password_hash(data["new_password"])
+    return jsonify({"message": "Invalid email or password"}), 401
 
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM register_users WHERE email=%s", (email,))
-    user = cursor.fetchone()
-
-    if user and check_password_hash(user["recovery_answer"], answer):
-        cursor.execute("""
-            UPDATE register_users 
-            SET password=%s WHERE email=%s
-        """, (new_password, email))
-        conn.commit()
-        msg = "Password reset successful"
-    else:
-        msg = "Recovery answer incorrect"
-
-    cursor.close()
-    conn.close()
-    return jsonify({"message": msg})
-
+# ---------------- WAREHOUSES ----------------
 @app.route("/api/warehouses", methods=["GET", "POST"])
 def warehouses():
     if request.method == "GET":
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
+
         cursor.execute("SELECT * FROM warehouses")
         data = cursor.fetchall()
+
         cursor.close()
         conn.close()
         return jsonify(data), 200
 
     if request.method == "POST":
-        try:
-            data = request.get_json()
+        data = request.json
 
-            name = data.get("name")
-            location = data.get("location")
-            capacity = data.get("capacity")
-
-            if not name or not location or capacity is None:
-                return jsonify({"message": "Invalid data"}), 400
-
-            conn = get_db_connection()
-            cursor = conn.cursor()
-
-            cursor.execute(
-                "INSERT INTO warehouses (name, location, capacity) VALUES (%s, %s, %s)",
-                (name, location, capacity)
-            )
-
-            conn.commit()
-            cursor.close()
-            conn.close()
-
-            return jsonify({"message": "Warehouse created"}), 201
-
-        except Exception as e:
-            print("Warehouse POST error:", e)
-            return jsonify({"message": "Server error"}), 500
-@app.route("/api/hubs", methods=["GET", "POST"])
-def hubs():
-    if request.method == "GET":
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM hubs")
-        data = cursor.fetchall()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO warehouses
+            (name, location, capacity, category, status, transportation_types)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (
+            data["name"],
+            data["location"],
+            data["capacity"],
+            data["category"],
+            data["status"],
+            ",".join(data.get("transportation_types", []))
+        ))
+
+        conn.commit()
         cursor.close()
         conn.close()
-        return jsonify(data), 200
 
-    if request.method == "POST":
-        try:
-            data = request.get_json()
+        return jsonify({"message": "Warehouse created"}), 201
 
-            name = data.get("name")
-            city = data.get("city")
-            status = data.get("status")
 
-            if not name or not city or not status:
-                return jsonify({"message": "Invalid data"}), 400
+# ================== ZONES ==================
 
-            conn = get_db_connection()
-            cursor = conn.cursor()
+# -------- GET ZONES --------
+@app.route("/api/zones", methods=["GET"])
+def get_zones():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-            cursor.execute(
-                "INSERT INTO hubs (name, city, status) VALUES (%s, %s, %s)",
-                (name, city, status)
-            )
+    cursor.execute("""
+        SELECT 
+            z.id,
+            w.name AS warehouse_name,
+            z.zone_name,
+            z.zone_type,
+            z.product_category,
+            z.status
+        FROM warehouse_zones z
+        JOIN warehouses w ON z.warehouse_id = w.id
+    """)
 
-            conn.commit()
-            cursor.close()
-            conn.close()
+    zones = cursor.fetchall()
 
-            return jsonify({"message": "Hub created"}), 201
+    cursor.close()
+    conn.close()
 
-        except Exception as e:
-            print("Hub POST error:", e)
-            return jsonify({"message": "Server error"}), 500
+    return jsonify(zones), 200
 
+
+# -------- CREATE ZONE --------
+@app.route("/api/zones", methods=["POST"])
+def create_zone():
+    try:
+        data = request.json
+        print("Received zone:", data)
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO warehouse_zones
+            (warehouse_id, zone_name, zone_type, product_category, status)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (
+            int(data["warehouse_id"]),
+            data["zone_name"],
+            data["zone_type"],
+            data["product_category"],
+            data["status"]
+        ))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": "Zone created successfully"}), 201
+
+    except Exception as e:
+        print("Create zone error:", e)
+        return jsonify({"error": str(e)}), 500
+@app.route('/api/products', methods=['POST'])
+def create_product():
+    try:
+        data = request.json
+        print("Received product:", data)
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO warehouse_products (
+                warehouse_id,
+                product_name,
+                product_type,
+                product_category,
+                quantity,
+                order_date,
+                order_time,
+                delivery_date,
+                delivery_time,
+                status
+            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (
+            int(data['warehouse_id']),
+            data['product_name'],
+            data['product_type'],
+            data['product_category'],
+            int(data['quantity']),
+            data['order_date'],
+            data['order_time'],
+            data['delivery_date'],
+            data['delivery_time'],
+            data['status']
+        ))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": "Product entry created"}), 201
+
+    except Exception as e:
+        print("Product entry error:", e)
+        return jsonify({"error": str(e)}), 500
+        
+# ---------------- RUN ----------------
 if __name__ == "__main__":
     app.run(debug=True)

@@ -8,6 +8,7 @@ export class DataService {
 
   constructor(private http: HttpClient) {}
 
+  /* Warehouses */
   getWarehouses() {
     return this.http.get<any[]>(`${this.api}/warehouses`);
   }
@@ -16,11 +17,22 @@ export class DataService {
     return this.http.post(`${this.api}/warehouses`, data);
   }
 
-  getHubs() {
-    return this.http.get<any[]>(`${this.api}/hubs`);
-  }
+ createZone(zone: any) {
+  return this.http.post(
+    'http://localhost:5000/api/zones',
+    zone
+  );
+}
 
-  createHub(data: any) {
-    return this.http.post(`${this.api}/hubs`, data);
-  }
+getZones() {
+  return this.http.get<any[]>(
+    'http://localhost:5000/api/zones'
+  );
+}
+createProduct(product: any) {
+  return this.http.post(
+    'http://localhost:5000/api/products',
+    product
+  );
+}
 }

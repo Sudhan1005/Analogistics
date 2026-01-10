@@ -1,28 +1,48 @@
-<h3>Warehouse List</h3>
+<div class="warehouse-bg">
+  <div class="warehouse-content">
 
-<table class="table table-bordered table-striped">
-  <thead class="table-dark">
-    <tr>
-      <th>#</th>
-      <th>Name</th>
-      <th>Location</th>
-      <th>Capacity</th>
-    </tr>
-  </thead>
-  <tbody>
+    <div class="container">
 
-    <tr *ngFor="let w of warehouses; index as i">
-      <td>{{ i + 1 }}</td>
-      <td>{{ w.name }}</td>
-      <td>{{ w.location }}</td>
-      <td>{{ w.capacity }}</td>
-    </tr>
+      <div class="warehouse-card shadow">
+        <h3 class="mb-3">Warehouse List</h3>
 
-    <tr *ngIf="warehouses.length === 0">
-      <td colspan="4" class="text-center text-danger">
-        No warehouses found
-      </td>
-    </tr>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Capacity</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Transport</th>
+              </tr>
+            </thead>
 
-  </tbody>
-</table>
+            <tbody>
+              <tr *ngFor="let w of warehouses; index as i">
+                <td>{{ i + 1 }}</td>
+                <td>{{ w.name }}</td>
+                <td>{{ w.location }}</td>
+                <td>{{ w.capacity }}</td>
+                <td>{{ w.category }}</td>
+                <td>{{ w.status }}</td>
+                <td>{{ w.transportation_types }}</td>
+              </tr>
+
+              <tr *ngIf="warehouses.length === 0">
+                <td colspan="7" class="text-center text-danger">
+                  No warehouses found
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>

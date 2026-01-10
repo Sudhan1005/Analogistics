@@ -15,7 +15,7 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/register`, data);
   }
 
-  // ✅ LOGIN (THIS WAS MISSING)
+  // ✅ LOGIN
   login(data: any) {
     return this.http.post(`${this.apiUrl}/login`, data);
   }
@@ -24,4 +24,32 @@ export class AuthService {
   forgotPassword(data: any) {
     return this.http.post(`${this.apiUrl}/forgot-password`, data);
   }
+
+  // ✅ SET LOGIN SESSION
+  setLogin() {
+    localStorage.setItem('isLoggedIn', 'true');
+  }
+
+  // ✅ CHECK LOGIN SESSION
+  isLoggedIn(): boolean {
+    return localStorage.getItem('isLoggedIn') === 'true';
+  }
+
+  // ✅ LOGOUT
+  logout() {
+    localStorage.removeItem('isLoggedIn');
+  }
+// restrict navigation (temporary / role based)
+setRestrictedUser() {
+  localStorage.setItem('navAccess', 'restricted');
+}
+
+setFullAccessUser() {
+  localStorage.setItem('navAccess', 'full');
+}
+
+hasFullAccess(): boolean {
+  return localStorage.getItem('navAccess') === 'full';
+}
+
 }
