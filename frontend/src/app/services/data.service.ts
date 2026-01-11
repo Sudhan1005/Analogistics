@@ -35,4 +35,32 @@ createProduct(product: any) {
     product
   );
 }
+getZonesByWarehouse(warehouseId: number) {
+  return this.http.get<any[]>(
+    `http://localhost:5000/api/zones/by-warehouse/${warehouseId}`
+  );
+}
+getProducts() {
+  return this.http.get<any[]>(
+    'http://localhost:5000/api/products'
+  );
+}
+getProductById(id: number) {
+  return this.http.get<any>(
+    `http://localhost:5000/api/products/${id}`
+  );
+}
+
+updateProduct(id: number, product: any) {
+  return this.http.put(
+    `http://localhost:5000/api/products/${id}`,
+    product
+  );
+}
+
+deleteProduct(id: number) {
+  return this.http.delete(
+    `http://localhost:5000/api/products/${id}`
+  );
+}
 }

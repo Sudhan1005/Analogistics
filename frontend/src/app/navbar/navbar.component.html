@@ -43,14 +43,30 @@
         </li>
       </ul>
     </li>
-   <li class="nav-item">
-      <a class="nav-link" routerLink="/dashboard/products/create">
-        Product Entry
+   <li class="nav-item dropdown">
+  <a
+    class="nav-link dropdown-toggle"
+    href="#"
+    role="button"
+    data-bs-toggle="dropdown">
+    Products
+  </a>
+
+  <ul class="dropdown-menu">
+    <li>
+      <a class="dropdown-item" routerLink="/dashboard/products">
+        Product List
       </a>
     </li>
 
+    <li>
+      <a class="dropdown-item" routerLink="/dashboard/products/create">
+        Product Entry
+      </a>
+    </li>
   </ul>
-  
+</li>
+  </ul>
 
   <button class="btn btn-outline-light ms-auto"
           (click)="logout()">

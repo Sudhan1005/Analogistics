@@ -1,0 +1,108 @@
+<div class="warehouse-bg">
+  <div class="warehouse-content">
+
+    <div class="container-fluid">
+
+      <div class="warehouse-card shadow">
+
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="mb-0">Product List</h4>
+        </div>
+
+        <!-- TABLE SCROLL WRAPPER -->
+        <div
+          class="table-responsive"
+          style="max-height: 70vh; overflow-y: auto; overflow-x: auto;">
+
+          <table
+            class="table table-bordered table-hover table-sm text-nowrap mb-0">
+
+            <!-- STICKY HEADER -->
+            <thead class="table-dark sticky-top">
+              <tr>
+                <th>#</th>
+                <th>Warehouse</th>
+                <th>Zone</th>
+                <th>Product</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Qty</th>
+                <th>Order Date</th>
+                <th>Delivery Date</th>
+                <th>Status</th>
+                <th class="text-center" style="width: 110px;">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let p of products; index as i">
+                <td>{{ i + 1 }}</td>
+
+                <td>{{ p.warehouse_name }}</td>
+
+                <td>
+                  {{ p.zone_name }}
+                  <small class="text-muted">
+                    ({{ p.zone_type }})
+                  </small>
+                </td>
+
+                <td>{{ p.product_name }}</td>
+                <td>{{ p.product_type }}</td>
+                <td>{{ p.product_category }}</td>
+                <td>{{ p.quantity }}</td>
+                <td>{{ p.order_date }}</td>
+                <td>{{ p.delivery_date }}</td>
+
+                <!-- STATUS -->
+                <td>
+                  <span
+                    class="badge"
+                    [ngClass]="getStatusClass(p.status)">
+                    {{ p.status }}
+                  </span>
+                </td>
+
+                <!-- ACTION ICONS -->
+                <td class="text-center">
+                  <i
+                    class="bi bi-eye-fill text-info me-2"
+                    title="View"
+                    role="button"
+                    (click)="viewProduct(p.id)">
+                  </i>
+
+                  <i
+                    class="bi bi-pencil-square text-warning me-2"
+                    title="Edit"
+                    role="button"
+                    (click)="editProduct(p.id)">
+                  </i>
+
+                  <i
+                    class="bi bi-trash-fill text-danger"
+                    title="Delete"
+                    role="button"
+                    (click)="deleteProduct(p.id)">
+                  </i>
+                </td>
+              </tr>
+
+              <!-- NO DATA -->
+              <tr *ngIf="products.length === 0">
+                <td colspan="11" class="text-center text-danger py-3">
+                  No products found
+                </td>
+              </tr>
+            </tbody>
+
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>

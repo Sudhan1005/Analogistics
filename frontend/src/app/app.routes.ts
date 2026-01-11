@@ -17,6 +17,7 @@ import { ZonesCreateComponent } from './zones/zones-create.component';
 
 /* Products */
 import { ProductEntryComponent } from './products/product-entry.component';
+import { ProductListComponent } from './products/product-list.component';
 
 /* Guard */
 import { AuthGuard } from './guards/auth.guard';
@@ -33,14 +34,22 @@ export const routes: Routes = [
     component: DashboardComponent,
     canActivate: [AuthGuard],
     children: [
+
+      /* Warehouses */
       { path: 'warehouses', component: WarehouseListComponent },
       { path: 'warehouses/create', component: WarehouseCreateComponent },
 
+      /* Zones */
       { path: 'zones', component: ZonesListComponent },
       { path: 'zones/create', component: ZonesCreateComponent },
 
-      { path: 'products/create', component: ProductEntryComponent }, // ✅ FIXED
+      /* Products */
+      { path: 'products', component: ProductListComponent },
+      { path: 'products/create', component: ProductEntryComponent },
+      { path: 'products/edit/:id', component: ProductEntryComponent },
+      { path: 'products/view/:id', component: ProductEntryComponent },
 
+      /* Default dashboard route */
       { path: '', redirectTo: 'warehouses', pathMatch: 'full' }
     ]
   },
