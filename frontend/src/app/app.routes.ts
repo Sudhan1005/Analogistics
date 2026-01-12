@@ -19,6 +19,9 @@ import { ZonesCreateComponent } from './zones/zones-create.component';
 import { ProductEntryComponent } from './products/product-entry.component';
 import { ProductListComponent } from './products/product-list.component';
 
+/* Delivery */
+import { DeliveryListComponent } from './delivery/delivery-list.component';
+
 /* Guard */
 import { AuthGuard } from './guards/auth.guard';
 
@@ -48,6 +51,9 @@ export const routes: Routes = [
       { path: 'products/create', component: ProductEntryComponent },
       { path: 'products/edit/:id', component: ProductEntryComponent },
       { path: 'products/view/:id', component: ProductEntryComponent },
+
+      /* Delivery */
+      { path: 'delivery', component: DeliveryListComponent },
 
       /* Default dashboard route */
       { path: '', redirectTo: 'warehouses', pathMatch: 'full' }

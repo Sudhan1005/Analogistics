@@ -270,24 +270,14 @@ def get_products():
 
     cursor.execute("""
         SELECT 
-            p.id,
-            p.warehouse_id,
-            p.zone_id,
+            p.*,
             w.name AS warehouse_name,
             z.zone_name,
-            z.zone_type,
-            p.product_name,
-            p.product_type,
-            p.product_category,
-            p.quantity,
-            p.order_date,
-            p.order_time,
-            p.delivery_date,
-            p.delivery_time,
-            p.status
+            z.zone_type
         FROM warehouse_products p
         JOIN warehouses w ON p.warehouse_id = w.id
         LEFT JOIN warehouse_zones z ON p.zone_id = z.id
+        WHERE p.status IN ('Inbound', 'Storage')
         ORDER BY p.id DESC
     """)
 
@@ -295,9 +285,7 @@ def get_products():
     cursor.close()
     conn.close()
 
-    # ✅ FIX ALL ROWS
     products = [serialize_row(p) for p in products]
-
     return jsonify(products), 200
 
 @app.route('/api/products/<int:product_id>', methods=['GET'])
@@ -376,6 +364,56 @@ def delete_product(product_id):
     conn.close()
 
     return jsonify({"message": "Product deleted successfully"}), 200
+
+@app.route('/api/delivery/products', methods=['GET'])
+def get_delivery_list():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+            p.*,
+            w.name AS warehouse_name,
+            z.zone_name,
+            z.zone_type
+        FROM warehouse_products p
+        JOIN warehouses w ON p.warehouse_id = w.id
+        LEFT JOIN warehouse_zones z ON p.zone_id = z.id
+        WHERE p.status = 'Outbound'
+        ORDER BY p.delivery_date ASC
+    """)
+
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    data = [serialize_row(d) for d in data]
+    return jsonify(data), 200
+
+@app.route('/api/logistics', methods=['GET'])
+def get_logistics_list():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+            p.*,
+            w.name AS warehouse_name,
+            z.zone_name,
+            z.zone_type
+        FROM warehouse_products p
+        JOIN warehouses w ON p.warehouse_id = w.id
+        LEFT JOIN warehouse_zones z ON p.zone_id = z.id
+        WHERE p.status = 'Out for Delivery'
+        ORDER BY p.delivery_date ASC
+    """)
+
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    data = [serialize_row(d) for d in data]
+    return jsonify(data), 200
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":

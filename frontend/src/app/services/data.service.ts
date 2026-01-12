@@ -8,7 +8,8 @@ export class DataService {
 
   constructor(private http: HttpClient) {}
 
-  /* Warehouses */
+  /* ===================== WAREHOUSES ===================== */
+
   getWarehouses() {
     return this.http.get<any[]>(`${this.api}/warehouses`);
   }
@@ -17,50 +18,91 @@ export class DataService {
     return this.http.post(`${this.api}/warehouses`, data);
   }
 
- createZone(zone: any) {
-  return this.http.post(
-    'http://localhost:5000/api/zones',
-    zone
+  /* ===================== ZONES ===================== */
+
+  createZone(zone: any) {
+    return this.http.post(`${this.api}/zones`, zone);
+  }
+
+  getZones() {
+    return this.http.get<any[]>(`${this.api}/zones`);
+  }
+
+  getZonesByWarehouse(warehouseId: number) {
+    return this.http.get<any[]>(
+      `${this.api}/zones/by-warehouse/${warehouseId}`
+    );
+  }
+
+  /* ===================== PRODUCTS ===================== */
+
+  createProduct(product: any) {
+    return this.http.post(`${this.api}/products`, product);
+  }
+
+  getProducts() {
+    return this.http.get<any[]>(`${this.api}/products`);
+  }
+
+  getProductById(id: number) {
+    return this.http.get<any>(`${this.api}/products/${id}`);
+  }
+
+  updateProduct(id: number, product: any) {
+    return this.http.put(
+      `${this.api}/products/${id}`,
+      product
+    );
+  }
+
+  deleteProduct(id: number) {
+    return this.http.delete(
+      `${this.api}/products/${id}`
+    );
+  }
+
+  /* ===================== DELIVERY ===================== */
+
+  // Assign Delivery (Create)
+  createDelivery(delivery: any) {
+    return this.http.post(
+      `${this.api}/delivery`,
+      delivery
+    );
+  }
+
+  // Delivery List
+  getDeliveries() {
+    return this.http.get<any[]>(
+      `${this.api}/delivery`
+    );
+  }
+
+  // Get Delivery by ID (Edit)
+  getDeliveryById(id: number) {
+    return this.http.get<any>(
+      `${this.api}/delivery/${id}`
+    );
+  }
+
+  // Update Delivery
+  updateDelivery(id: number, delivery: any) {
+    return this.http.put(
+      `${this.api}/delivery/${id}`,
+      delivery
+    );
+  }
+
+  // Delete Delivery
+  deleteDelivery(id: number) {
+    return this.http.delete(
+      `${this.api}/delivery/${id}`
+    );
+  }
+getOutboundProductsForDelivery() {
+  return this.http.get<any[]>(
+    `${this.api}/delivery/products`
   );
 }
 
-getZones() {
-  return this.http.get<any[]>(
-    'http://localhost:5000/api/zones'
-  );
-}
-createProduct(product: any) {
-  return this.http.post(
-    'http://localhost:5000/api/products',
-    product
-  );
-}
-getZonesByWarehouse(warehouseId: number) {
-  return this.http.get<any[]>(
-    `http://localhost:5000/api/zones/by-warehouse/${warehouseId}`
-  );
-}
-getProducts() {
-  return this.http.get<any[]>(
-    'http://localhost:5000/api/products'
-  );
-}
-getProductById(id: number) {
-  return this.http.get<any>(
-    `http://localhost:5000/api/products/${id}`
-  );
-}
-
-updateProduct(id: number, product: any) {
-  return this.http.put(
-    `http://localhost:5000/api/products/${id}`,
-    product
-  );
-}
-
-deleteProduct(id: number) {
-  return this.http.delete(
-    `http://localhost:5000/api/products/${id}`
-  );
-}
 }

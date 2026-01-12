@@ -1,0 +1,61 @@
+<div class="container mt-4 warehouse-bg">
+  <h4>{{ isEdit ? 'Edit Delivery' : 'Assign Delivery' }}</h4>
+
+  <form (ngSubmit)="submit()" class="card p-4">
+
+    <div class="mb-3">
+      <label>Product Name</label>
+      <input class="form-control"
+             [(ngModel)]="delivery.product_name"
+             name="product_name"
+             required>
+    </div>
+
+    <div class="mb-3">
+      <label>Quantity</label>
+      <input type="number"
+             class="form-control"
+             [(ngModel)]="delivery.quantity"
+             name="quantity"
+             required>
+    </div>
+
+    <div class="mb-3">
+      <label>Driver Name</label>
+      <select class="form-control"
+              [(ngModel)]="delivery.driver_name"
+              name="driver_name"
+              required>
+        <option value="">Select Driver</option>
+        <option *ngFor="let d of drivers" [value]="d">
+          {{ d }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label>Delivery Slot</label>
+      <select class="form-control"
+              [(ngModel)]="delivery.delivery_slot"
+              name="delivery_slot"
+              required>
+        <option value="">Select Slot</option>
+        <option *ngFor="let s of slots" [value]="s">
+          {{ s }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mt-3">
+      <button class="btn btn-primary me-2" type="submit">
+        {{ isEdit ? 'Update Delivery' : 'Assign Delivery' }}
+      </button>
+
+      <button class="btn btn-secondary" type="button"
+              (click)="cancel()">
+        Cancel
+      </button>
+    </div>
+
+  </form>
+</div>
