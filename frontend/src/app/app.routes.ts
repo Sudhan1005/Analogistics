@@ -21,7 +21,9 @@ import { ProductListComponent } from './products/product-list.component';
 
 /* Delivery */
 import { DeliveryListComponent } from './delivery/delivery-list.component';
-
+/* Delivery Slots*/
+import { DeliverySlotListComponent } from './delivery/delivery-slot-list.component';
+import { DeliverySlotCreateComponent } from './delivery/delivery-slot-create.component';
 /* Guard */
 import { AuthGuard } from './guards/auth.guard';
 
@@ -54,6 +56,11 @@ export const routes: Routes = [
 
       /* Delivery */
       { path: 'delivery', component: DeliveryListComponent },
+      /* Delivery Slots */
+      { path: 'delivery-slots', component: DeliverySlotListComponent },
+      { path: 'delivery-slots/create', component: DeliverySlotCreateComponent },
+      { path: 'delivery-slots/edit/:id', component: DeliverySlotCreateComponent },
+      { path: 'delivery-slots/view/:id', component: DeliverySlotCreateComponent },
 
       /* Default dashboard route */
       { path: '', redirectTo: 'warehouses', pathMatch: 'full' }

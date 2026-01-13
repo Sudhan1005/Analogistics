@@ -1,23 +1,25 @@
 <div class="warehouse-bg">
   <div class="warehouse-content">
 
-    <div class="container d-flex justify-content-center">
+    <div class="warehouse-card shadow">
 
-      <div class="warehouse-card shadow w-100" style="max-width: 900px;">
+      <!-- HEADER -->
+      <h4 class="mb-4 text-center">
+        {{ isEdit ? 'Edit Product' : isViewMode ? 'View Product' : 'Create Product' }}
+      </h4>
 
-        <h4 class="text-center mb-4">
-          {{ mode === 'view' ? 'View Product' :
-             mode === 'edit' ? 'Edit Product' :
-             'Product Entry' }}
-        </h4>
+      <!-- FORM -->
+      <form (ngSubmit)="submit()" #productForm="ngForm">
 
         <!-- Warehouse -->
         <div class="mb-3">
           <label class="form-label">Warehouse</label>
           <select class="form-select"
                   [(ngModel)]="product.warehouse_id"
+                  name="warehouse_id"
                   (change)="onWarehouseChange()"
-                  [disabled]="isViewMode">
+                  [disabled]="isViewMode"
+                  required>
             <option value="">Select Warehouse</option>
             <option *ngFor="let w of warehouses" [value]="w.id">
               {{ w.name }}
@@ -30,7 +32,9 @@
           <label class="form-label">Zone</label>
           <select class="form-select"
                   [(ngModel)]="product.zone_id"
-                  [disabled]="isViewMode">
+                  name="zone_id"
+                  [disabled]="isViewMode"
+                  required>
             <option value="">Select Zone</option>
             <option *ngFor="let z of zones" [value]="z.id">
               {{ z.zone_name }} ({{ z.zone_type }})
@@ -43,7 +47,9 @@
           <label class="form-label">Product Name</label>
           <input class="form-control"
                  [(ngModel)]="product.product_name"
-                 [readonly]="isViewMode">
+                 name="product_name"
+                 [disabled]="isViewMode"
+                 required>
         </div>
 
         <!-- Product Type -->
@@ -51,7 +57,9 @@
           <label class="form-label">Product Type</label>
           <select class="form-select"
                   [(ngModel)]="product.product_type"
-                  [disabled]="isViewMode">
+                  name="product_type"
+                  [disabled]="isViewMode"
+                  required>
             <option value="">Select Type</option>
             <option *ngFor="let t of productTypes" [value]="t">
               {{ t }}
@@ -64,7 +72,9 @@
           <label class="form-label">Product Category</label>
           <select class="form-select"
                   [(ngModel)]="product.product_category"
-                  [disabled]="isViewMode">
+                  name="product_category"
+                  [disabled]="isViewMode"
+                  required>
             <option value="">Select Category</option>
             <option *ngFor="let c of productCategories" [value]="c">
               {{ c }}
@@ -78,7 +88,9 @@
           <input type="number"
                  class="form-control"
                  [(ngModel)]="product.quantity"
-                 [readonly]="isViewMode">
+                 name="quantity"
+                 [disabled]="isViewMode"
+                 required>
         </div>
 
         <!-- Order Date & Time -->
@@ -88,7 +100,9 @@
             <input type="date"
                    class="form-control"
                    [(ngModel)]="product.order_date"
-                   [disabled]="isViewMode">
+                   name="order_date"
+                   [disabled]="isViewMode"
+                   required>
           </div>
 
           <div class="col-md-6 mb-3">
@@ -96,7 +110,9 @@
             <input type="time"
                    class="form-control"
                    [(ngModel)]="product.order_time"
-                   [disabled]="isViewMode">
+                   name="order_time"
+                   [disabled]="isViewMode"
+                   required>
           </div>
         </div>
 
@@ -107,7 +123,9 @@
             <input type="date"
                    class="form-control"
                    [(ngModel)]="product.delivery_date"
-                   [disabled]="isViewMode">
+                   name="delivery_date"
+                   [disabled]="isViewMode"
+                   required>
           </div>
 
           <div class="col-md-6 mb-3">
@@ -115,7 +133,9 @@
             <input type="time"
                    class="form-control"
                    [(ngModel)]="product.delivery_time"
-                   [disabled]="isViewMode">
+                   name="delivery_time"
+                   [disabled]="isViewMode"
+                   required>
           </div>
         </div>
 
@@ -124,7 +144,9 @@
           <label class="form-label">Status</label>
           <select class="form-select"
                   [(ngModel)]="product.status"
-                  [disabled]="isViewMode">
+                  name="status"
+                  [disabled]="isViewMode"
+                  required>
             <option value="">Select Status</option>
             <option *ngFor="let s of statuses" [value]="s">
               {{ s }}
@@ -132,17 +154,22 @@
           </select>
         </div>
 
-        <!-- SAVE / UPDATE BUTTON -->
-        <button
-          *ngIf="!isViewMode"
-          class="btn btn-primary w-100"
-          (click)="saveProduct()">
+        <!-- ACTION BUTTONS -->
+        <div class="d-flex gap-2 justify-content-center">
+          <button type="submit"
+                  class="btn btn-primary px-4"
+                  *ngIf="!isViewMode">
+            {{ isEdit ? 'Update Product' : 'Save Product Entry' }}
+          </button>
 
-          {{ mode === 'edit' ? 'Update Product' : 'Save Product Entry' }}
+          <button type="button"
+                  class="btn btn-secondary px-4"
+                  (click)="cancel()">
+            Back
+          </button>
+        </div>
 
-        </button>
-
-      </div>
+      </form>
 
     </div>
 

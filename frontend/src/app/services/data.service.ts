@@ -104,5 +104,24 @@ getOutboundProductsForDelivery() {
     `${this.api}/delivery/products`
   );
 }
+/* Delivery Slots */
+getDeliverySlots() {
+  return this.http.get<any[]>(`${this.api}/delivery-slots`);
+}
 
+getDeliverySlotById(id: number) {
+  return this.http.get<any>(`${this.api}/delivery-slots/${id}`);
+}
+
+createDeliverySlot(data: any) {
+  return this.http.post(`${this.api}/delivery-slots`, data);
+}
+
+updateDeliverySlot(id: number, data: any) {
+  return this.http.put(`${this.api}/delivery-slots/${id}`, data);
+}
+
+deleteDeliverySlot(id: number) {
+  return this.http.delete(`${this.api}/delivery-slots/${id}`);
+}
 }

@@ -414,6 +414,112 @@ def get_logistics_list():
 
     data = [serialize_row(d) for d in data]
     return jsonify(data), 200
+# ================= DELIVERY SLOTS =================
+
+@app.route('/api/delivery-slots', methods=['GET'])
+def get_delivery_slots():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT id, slot_name, start_time, end_time
+        FROM delivery_slots
+        ORDER BY id DESC
+    """)
+
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    data = [serialize_row(d) for d in data]
+    return jsonify(data), 200
+
+
+@app.route('/api/delivery-slots', methods=['POST'])
+def create_delivery_slot():
+    data = request.json
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO delivery_slots (slot_name, start_time, end_time)
+        VALUES (%s, %s, %s)
+    """, (
+        data['slot_name'],
+        data['start_time'],
+        data['end_time']
+    ))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Delivery slot created"}), 201
+
+
+@app.route('/api/delivery-slots/<int:id>', methods=['GET'])
+def get_delivery_slot(id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT id, slot_name, start_time, end_time
+        FROM delivery_slots
+        WHERE id = %s
+    """, (id,))
+
+    slot = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if not slot:
+        return jsonify({"message": "Not found"}), 404
+
+    slot = serialize_row(slot)
+    return jsonify(slot), 200
+
+
+@app.route('/api/delivery-slots/<int:id>', methods=['PUT'])
+def update_delivery_slot(id):
+    data = request.json
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE delivery_slots
+        SET slot_name=%s, start_time=%s, end_time=%s
+        WHERE id=%s
+    """, (
+        data['slot_name'],
+        data['start_time'],
+        data['end_time'],
+        id
+    ))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Delivery slot updated"}), 200
+
+
+@app.route('/api/delivery-slots/<int:id>', methods=['DELETE'])
+def delete_delivery_slot(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM delivery_slots WHERE id=%s",
+        (id,)
+    )
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Delivery slot deleted"}), 200
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":

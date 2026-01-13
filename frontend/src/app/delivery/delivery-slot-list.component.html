@@ -1,0 +1,57 @@
+<div class="warehouse-bg">
+  <div class="warehouse-content">
+
+    <div class="container">
+
+      <div class="warehouse-card shadow">
+        <h3 class="mb-3">Delivery Slot List</h3>
+
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped mb-0">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Slot Name</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let s of slots; index as i">
+                <td>{{ i + 1 }}</td>
+                <td>{{ s.slot_name }}</td>
+                <td>{{ s.start_time }}</td>
+                <td>{{ s.end_time }}</td>
+
+                <td class="text-center">
+                  <i class="bi bi-eye-fill text-info me-2"
+                     title="View"
+                     (click)="view(s.id)"></i>
+
+                  <i class="bi bi-pencil-square text-warning me-2"
+                     title="Edit"
+                     (click)="edit(s.id)"></i>
+
+                  <i class="bi bi-trash-fill text-danger"
+                     title="Delete"
+                     (click)="delete(s.id)"></i>
+                </td>
+              </tr>
+
+              <tr *ngIf="slots.length === 0">
+                <td colspan="5" class="text-center text-danger">
+                  No delivery slots found
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>

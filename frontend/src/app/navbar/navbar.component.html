@@ -66,10 +66,37 @@
     </li>
   </ul>
 </li>
-<li class="nav-item">
-  <a class="nav-link" routerLink="/dashboard/delivery">
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle"
+     role="button"
+     data-bs-toggle="dropdown">
     Delivery
   </a>
+
+  <ul class="dropdown-menu">
+
+    <li>
+      <a class="dropdown-item"
+         routerLink="/dashboard/delivery">
+        Delivery List
+      </a>
+    </li>
+
+    <li>
+      <a class="dropdown-item"
+         routerLink="/dashboard/delivery-slots">
+        Delivery Slot List
+      </a>
+    </li>
+
+    <li>
+      <a class="dropdown-item"
+         routerLink="/dashboard/delivery-slots/create">
+        Create Delivery Slot
+      </a>
+    </li>
+
+  </ul>
 </li>
   </ul>
 

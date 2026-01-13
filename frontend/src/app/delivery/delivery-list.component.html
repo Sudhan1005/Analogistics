@@ -2,7 +2,6 @@
   <div class="warehouse-content">
 
     <div class="container-fluid">
-
       <div class="warehouse-card shadow">
 
         <!-- HEADER -->
@@ -31,16 +30,15 @@
                 <th>Order Date</th>
                 <th>Delivery Date</th>
                 <th>Remaining</th>
-                <!-- 🆕 DELIVERY FIELDS -->
                 <th>Driver</th>
                 <th>Slot</th>
-
                 <th>Status</th>
                 <th class="text-center" style="width: 110px;">Actions</th>
               </tr>
             </thead>
 
             <tbody>
+
               <tr *ngFor="let d of deliveries; index as i">
                 <td>{{ i + 1 }}</td>
 
@@ -59,15 +57,17 @@
                 <td>{{ d.quantity }}</td>
                 <td>{{ d.order_date }}</td>
                 <td>{{ d.delivery_date }}</td>
-                <td>
-  <span [ngClass]="getRemainingClass(d)">
-    {{ getRemainingTime(d) }}
-  </span>
-</td>
 
-                <!-- 🆕 DRIVER & SLOT -->
-                <td>{{ d.driver_name }}</td>
-                <td>{{ d.delivery_slot }}</td>
+                <!-- ✅ SAME REMAINING STYLE AS PRODUCT LIST -->
+                <td>
+                  <span [ngClass]="getRemainingClass(d)">
+                    {{ getRemainingTime(d) }}
+                  </span>
+                </td>
+
+                <!-- EXTRA DELIVERY FIELDS -->
+                <td>{{ d.driver_name || '-' }}</td>
+                <td>{{ d.delivery_slot || '-' }}</td>
 
                 <!-- STATUS -->
                 <td>
@@ -78,22 +78,8 @@
                   </span>
                 </td>
 
-                <!-- ACTION ICONS -->
+                <!-- ACTION ICONS (same spacing as product list) -->
                 <td class="text-center">
-                  <i
-                    class="bi bi-eye-fill text-info me-2"
-                    title="View"
-                    role="button"
-                    (click)="viewDelivery(d.id)">
-                  </i>
-
-                  <i
-                    class="bi bi-pencil-square text-warning me-2"
-                    title="Edit"
-                    role="button"
-                    (click)="editDelivery(d.id)">
-                  </i>
-
                   <i
                     class="bi bi-trash-fill text-danger"
                     title="Delete"
@@ -105,17 +91,16 @@
 
               <!-- NO DATA -->
               <tr *ngIf="deliveries.length === 0">
-                <td colspan="13" class="text-center text-danger py-3">
+                <td colspan="14" class="text-center text-danger py-3">
                   No deliveries found
                 </td>
               </tr>
+
             </tbody>
-
           </table>
+
         </div>
-
       </div>
-
     </div>
 
   </div>

@@ -1,55 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DataService } from '../services/data.service';
 
 @Component({
   selector: 'app-product-entry',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './product-entry.component.html'
 })
 export class ProductEntryComponent implements OnInit {
 
-  /* ===== MODE HANDLING ===== */
-  mode: 'create' | 'edit' | 'view' = 'create';
-  isViewMode = false;
-  productId!: number;
-
-  /* ===== DROPDOWNS ===== */
-  warehouses: any[] = [];
-  zones: any[] = [];
-
-  productTypes = [
-    'Raw Material',
-    'Finished Goods',
-    'Perishable',
-    'Fragile',
-    'Hazardous'
-  ];
-
-  productCategories = [
-    'Electronics',
-    'FMCG',
-    'Pharmaceuticals',
-    'Apparel',
-    'Cold Storage'
-  ];
-
-  statuses = [
-    'Inbound',
-    'Outbound',
-    'Storage',
-    'Delivery Assigned',
-    'Out for Delivery',
-    'Driver Yet to Assign',
-    'Driver Assigned',
-    'Logistics Ongoing',
-    'Delivered'
-  ];
-
-  /* ===== MODEL ===== */
   product: any = {
     warehouse_id: '',
     zone_id: '',
@@ -64,118 +26,121 @@ export class ProductEntryComponent implements OnInit {
     status: ''
   };
 
+  warehouses: any[] = [];
+  zones: any[] = [];
+  statuses: string[] = [
+  'Inbound',
+  'Storage',
+  'Outbound',
+  'Delivery Assigned',
+  'Driver Yet to Assign',
+  'Driver Assigned',
+  'Out for Delivery',
+  'Logistics Ongoing',
+  'Delivered'
+];
+productTypes: string[] = [
+  'Raw Material',
+  'Finished Goods',
+  'Semi Finished',
+  'Consumables'
+];
+
+productCategories: string[] = [
+  'Electronics',
+  'Food',
+  'Clothing',
+  'Apparel',
+  'Pharmaceutical',
+  'Machinery'
+];
+  isEdit = false;
+  isView = false;
+  isViewMode = false;
+
+  productId!: number;
+
   constructor(
     private dataService: DataService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    const path = this.route.snapshot.routeConfig?.path || '';
 
-  // Detect mode
-  const url = this.route.snapshot.url.join('/');
+    this.isEdit = path.includes('edit');
+    this.isView = path.includes('view');
+    this.isViewMode = this.isView;
 
-  if (url.includes('view')) {
-    this.mode = 'view';
-    this.isViewMode = true;
-  } else if (url.includes('edit')) {
-    this.mode = 'edit';
+    // ✅ FIRST load warehouses
+    this.dataService.getWarehouses().subscribe(whs => {
+      this.warehouses = whs;
+
+      // ✅ THEN load product if edit/view
+      if (id) {
+        this.productId = +id;
+        this.loadProduct(this.productId);
+      }
+    });
   }
 
-  const id = this.route.snapshot.paramMap.get('id');
-  this.productId = id ? Number(id) : 0;
+  /* ================= LOAD PRODUCT (FIXED ORDER) ================= */
 
-  this.dataService.getWarehouses().subscribe({
-    next: (res) => {
-      this.warehouses = res;
+loadProduct(id: number) {
+  this.dataService.getProductById(id).subscribe(prod => {
+    this.product = prod;
 
-      if (this.productId) {
-        this.loadProduct(this.productId);
-      }
-    }
-  });
-  // Load warehouses FIRST
-  this.dataService.getWarehouses().subscribe({
-    next: (warehouses) => {
-      this.warehouses = warehouses;
-
-      // Load product AFTER warehouses
-      if (this.productId) {
-        this.loadProduct(this.productId);
-      }
-    },
-    error: () => alert('Failed to load warehouses')
-  });
-}
-
-  /* ===== LOAD PRODUCT FOR EDIT / VIEW ===== */
-  loadProduct(id: number): void {
-  this.dataService.getProductById(id).subscribe({
-    next: (res) => {
-
-      // 1️⃣ Normalize date fields (safety)
-      this.product = {
-        ...res,
-        order_date: res.order_date?.substring(0, 10),
-        delivery_date: res.delivery_date?.substring(0, 10)
-      };
-
-      // 2️⃣ Load zones AFTER warehouse is known
-      this.dataService
-        .getZonesByWarehouse(this.product.warehouse_id)
-        .subscribe({
-          next: (zones) => {
-            this.zones = zones;
-
-            // 3️⃣ Ensure zone binding AFTER zones load
-            setTimeout(() => {
-              this.product.zone_id = res.zone_id;
-            });
-          }
-        });
-    },
-    error: () => {
-      alert('Failed to load product details');
-      this.router.navigate(['/dashboard/products']);
-    }
-  });
-}
-  /* ===== LOAD ZONES BY WAREHOUSE ===== */
-  onWarehouseChange(): void {
-    this.zones = [];
-    this.product.zone_id = '';
-
+    // Load zones AFTER warehouse (unchanged)
     if (this.product.warehouse_id) {
       this.dataService
         .getZonesByWarehouse(this.product.warehouse_id)
-        .subscribe(res => this.zones = res);
+        .subscribe(zs => {
+          this.zones = zs;
+          this.cdr.detectChanges();
+        });
+    } else {
+      this.cdr.detectChanges();
     }
+  });
+}
+  /* ================= WAREHOUSE CHANGE ================= */
+
+  onWarehouseChange() {
+    if (!this.product.warehouse_id) {
+      this.zones = [];
+      this.product.zone_id = '';
+      return;
+    }
+
+    this.dataService
+      .getZonesByWarehouse(this.product.warehouse_id)
+      .subscribe(zs => {
+        this.zones = zs;
+        this.cdr.detectChanges();
+      });
   }
 
-  /* ===== SAVE / UPDATE ===== */
-  saveProduct(): void {
+  /* ================= SAVE ================= */
 
-  if (this.isViewMode) return;
-
-  if (this.mode === 'edit') {
-    // 🔵 UPDATE
-    this.dataService.updateProduct(this.productId, this.product).subscribe({
-      next: () => {
+  submit() {
+  if (this.isEdit) {
+    this.dataService.updateProduct(this.productId, this.product)
+      .subscribe(() => {
         alert('Product updated successfully');
         this.router.navigate(['/dashboard/products']);
-      },
-      error: () => alert('Error updating product')
-    });
-
+      });
   } else {
-    // 🟢 CREATE
-    this.dataService.createProduct(this.product).subscribe({
-      next: () => {
+    this.dataService.createProduct(this.product)
+      .subscribe(() => {
         alert('Product created successfully');
         this.router.navigate(['/dashboard/products']);
-      },
-      error: () => alert('Error creating product')
-    });
+      });
   }
 }
+  cancel() {
+    this.router.navigate(['/dashboard/products']);
+  }
 }
