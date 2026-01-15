@@ -124,4 +124,82 @@ updateDeliverySlot(id: number, data: any) {
 deleteDeliverySlot(id: number) {
   return this.http.delete(`${this.api}/delivery-slots/${id}`);
 }
+/* DRIVERS */
+getDrivers() {
+  return this.http.get<any[]>('http://localhost:5000/api/drivers');
+}
+
+getDriverById(id: number) {
+  return this.http.get<any>(`http://localhost:5000/api/drivers/${id}`);
+}
+
+createDriver(data: any) {
+  return this.http.post('http://localhost:5000/api/drivers', data);
+}
+
+updateDriver(id: number, data: any) {
+  return this.http.put(`http://localhost:5000/api/drivers/${id}`, data);
+}
+
+deleteDriver(id: number) {
+  return this.http.delete(`http://localhost:5000/api/drivers/${id}`);
+}
+/* DELIVERY */
+getDeliveryList() {
+  return this.http.get<any[]>(
+    'http://localhost:5000/api/delivery/products'
+  );
+}
+
+assignDelivery(id: number, data: any) {
+  return this.http.put(
+    `http://localhost:5000/api/delivery/assign/${id}`,
+    data
+  );
+}
+/* ================= LOGISTICS ================= */
+
+/* Assign (Create) Logistics */
+assignLogistics(data: any) {
+  return this.http.post(
+    `${this.api}/logistics`,
+    data
+  );
+}
+
+/* Get Logistics List */
+getLogisticsList() {
+  return this.http.get<any[]>(
+    `${this.api}/logistics`
+  );
+}
+
+/* Get Logistics By ID (Edit / View) */
+getLogisticsById(id: number) {
+  return this.http.get<any>(
+    `${this.api}/logistics/${id}`
+  );
+}
+
+/* ✅ UPDATE LOGISTICS (FIX FOR YOUR ERROR) */
+updateLogistics(id: number, data: any) {
+  return this.http.put(
+    `${this.api}/logistics/${id}`,
+    data
+  );
+}
+
+/* Delete Logistics */
+deleteLogistics(id: number) {
+  return this.http.delete(
+    `${this.api}/logistics/${id}`
+  );
+}
+
+/* Tracking Cards */
+getLogisticsTracking() {
+  return this.http.get<any[]>(
+    `${this.api}/logistics/tracking`
+  );
+}
 }

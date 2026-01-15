@@ -4,104 +4,77 @@
 
   <ul class="navbar-nav me-auto">
 
+    <!-- ================= WAREHOUSES ================= -->
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
         Warehouses
       </a>
       <ul class="dropdown-menu">
-        <li>
-          <a class="dropdown-item"
-             routerLink="/dashboard/warehouses">
-            Warehouse List
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item"
-             routerLink="/dashboard/warehouses/create">
-            Create Warehouse
-          </a>
-        </li>
+        <li><a class="dropdown-item" routerLink="/dashboard/warehouses">Warehouse List</a></li>
+        <li><a class="dropdown-item" routerLink="/dashboard/warehouses/create">Create Warehouse</a></li>
       </ul>
     </li>
 
+    <!-- ================= ZONES ================= -->
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
         Zones
       </a>
       <ul class="dropdown-menu">
-        <li>
-          <a class="dropdown-item"
-             routerLink="/dashboard/zones">
-            Zone List
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item"
-             routerLink="/dashboard/zones/create">
-            Create Zone
-          </a>
-        </li>
+        <li><a class="dropdown-item" routerLink="/dashboard/zones">Zone List</a></li>
+        <li><a class="dropdown-item" routerLink="/dashboard/zones/create">Create Zone</a></li>
       </ul>
     </li>
+
+    <!-- ================= PRODUCTS ================= -->
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+        Products
+      </a>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" routerLink="/dashboard/products">Product List</a></li>
+        <li><a class="dropdown-item" routerLink="/dashboard/products/create">Product Entry</a></li>
+      </ul>
+    </li>
+
+    <!-- ================= DELIVERY ================= -->
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+        Delivery
+      </a>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" routerLink="/dashboard/delivery">Delivery List</a></li>
+        <li><a class="dropdown-item" routerLink="/dashboard/delivery-slots">Delivery Slot List</a></li>
+        <li><a class="dropdown-item" routerLink="/dashboard/delivery-slots/create">Create Delivery Slot</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" routerLink="/dashboard/drivers">Driver List</a></li>
+        <li><a class="dropdown-item" routerLink="/dashboard/drivers/create">Create Driver</a></li>
+      </ul>
+    </li>
+
+    <!-- ================= LOGISTICS (NEW TAB) ================= -->
    <li class="nav-item dropdown">
-  <a
-    class="nav-link dropdown-toggle"
-    href="#"
-    role="button"
-    data-bs-toggle="dropdown">
-    Products
+  <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+    Logistics
   </a>
-
   <ul class="dropdown-menu">
     <li>
-      <a class="dropdown-item" routerLink="/dashboard/products">
-        Product List
+      <a class="dropdown-item"
+         routerLink="/dashboard/logistics/list">
+        Assigned Logistics
       </a>
     </li>
-
     <li>
-      <a class="dropdown-item" routerLink="/dashboard/products/create">
-        Product Entry
+      <a class="dropdown-item"
+         routerLink="/dashboard/logistics/tracking">
+        Overall Tracking
       </a>
     </li>
   </ul>
 </li>
-<li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle"
-     role="button"
-     data-bs-toggle="dropdown">
-    Delivery
-  </a>
-
-  <ul class="dropdown-menu">
-
-    <li>
-      <a class="dropdown-item"
-         routerLink="/dashboard/delivery">
-        Delivery List
-      </a>
-    </li>
-
-    <li>
-      <a class="dropdown-item"
-         routerLink="/dashboard/delivery-slots">
-        Delivery Slot List
-      </a>
-    </li>
-
-    <li>
-      <a class="dropdown-item"
-         routerLink="/dashboard/delivery-slots/create">
-        Create Delivery Slot
-      </a>
-    </li>
-
-  </ul>
-</li>
   </ul>
 
-  <button class="btn btn-outline-light ms-auto"
-          (click)="logout()">
+  <button class="btn btn-outline-light ms-auto" (click)="logout()">
     Logout
   </button>
 

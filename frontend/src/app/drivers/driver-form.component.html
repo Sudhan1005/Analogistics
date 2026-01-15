@@ -1,0 +1,95 @@
+<div class="warehouse-bg">
+  <div class="warehouse-content d-flex justify-content-center align-items-center">
+
+    <div class="warehouse-card shadow" style="max-width:600px;width:100%">
+      <h4 class="text-center mb-4">
+        {{ isEdit ? 'Edit Driver' : isView ? 'View Driver' : 'Create Driver' }}
+      </h4>
+
+      <form (ngSubmit)="submit()" #f="ngForm">
+
+        <div class="mb-3">
+          <label>Driver Name</label>
+          <input class="form-control"
+                 [(ngModel)]="driver.driver_name"
+                 name="driver_name"
+                 [disabled]="isView" required>
+        </div>
+
+        <div class="mb-3">
+          <label>Gender</label>
+          <select class="form-select"
+                  [(ngModel)]="driver.gender"
+                  name="gender"
+                  [disabled]="isView" required>
+            <option value="">Select</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label>Email</label>
+          <input class="form-control"
+                 [(ngModel)]="driver.email"
+                 name="email"
+                 [disabled]="isView">
+        </div>
+
+        <div class="mb-3">
+          <label>Phone</label>
+          <input class="form-control"
+                 [(ngModel)]="driver.phone"
+                 name="phone"
+                 [disabled]="isView">
+        </div>
+
+        <div class="mb-3">
+          <label>Last Working Company</label>
+          <input class="form-control"
+                 [(ngModel)]="driver.last_company"
+                 name="last_company"
+                 [disabled]="isView">
+        </div>
+
+        <div class="mb-3">
+          <label>Govt Proof Type</label>
+          <select class="form-select"
+                  [(ngModel)]="driver.govt_id_type"
+                  name="govt_id_type"
+                  [disabled]="isView" required>
+            <option>Aadhaar</option>
+            <option>PAN</option>
+            <option>Voter ID</option>
+            <option>Passport</option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label>Govt Proof Number</label>
+          <input class="form-control"
+                 [(ngModel)]="driver.govt_id_number"
+                 name="govt_id_number"
+                 [disabled]="isView" required>
+        </div>
+
+        <div class="d-flex justify-content-center gap-3">
+          <button *ngIf="!isView"
+                  class="btn btn-primary"
+                  type="submit">
+            {{ isEdit ? 'Update' : 'Save' }}
+          </button>
+
+          <button type="button"
+                  class="btn btn-secondary"
+                  (click)="cancel()">
+            Back
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>

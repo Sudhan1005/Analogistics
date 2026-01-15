@@ -1,0 +1,46 @@
+<div class="warehouse-bg d-flex justify-content-center align-items-center">
+  <div class="card p-4 shadow" style="width:600px">
+    <h4 class="mb-3 text-center">Assign Logistics</h4>
+
+    <div class="mb-3">
+      <label>From Warehouse</label>
+      <input class="form-control" [value]="delivery.warehouse_name" disabled [disabled]="isView">
+    </div>
+
+    <div class="mb-3">
+      <label>To Warehouse</label>
+      <select class="form-select"
+              [(ngModel)]="logistics.to_warehouse_id"
+              (change)="loadZones()"
+              [disabled]="isView">
+        <option value="">Select</option>
+        <option *ngFor="let w of warehouses" [value]="w.id">
+          {{ w.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label>To Zone</label>
+      <select class="form-select" [(ngModel)]="logistics.to_zone_id"[disabled]="isView">
+        <option *ngFor="let z of zones" [value]="z.id">
+          {{ z.zone_name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label>Transport Type</label>
+      <input class="form-control" [(ngModel)]="logistics.transport_type"[disabled]="isView">
+    </div>
+
+    <div class="mb-3">
+      <label>Vehicle Number</label>
+      <input class="form-control" [(ngModel)]="logistics.vehicle_number"[disabled]="isView">
+    </div>
+
+    <button class="btn btn-primary w-100" (click)="save()">
+      Assign Logistics
+    </button>
+  </div>
+</div>

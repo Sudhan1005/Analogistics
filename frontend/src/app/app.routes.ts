@@ -21,9 +21,14 @@ import { ProductListComponent } from './products/product-list.component';
 
 /* Delivery */
 import { DeliveryListComponent } from './delivery/delivery-list.component';
+import { DeliveryFormComponent } from './delivery/delivery-form.component';
 /* Delivery Slots*/
 import { DeliverySlotListComponent } from './delivery/delivery-slot-list.component';
 import { DeliverySlotCreateComponent } from './delivery/delivery-slot-create.component';
+/*Drivers */
+import { DriverListComponent } from './drivers/driver-list.component';
+import { DriverFormComponent } from './drivers/driver-form.component';
+
 /* Guard */
 import { AuthGuard } from './guards/auth.guard';
 
@@ -61,6 +66,51 @@ export const routes: Routes = [
       { path: 'delivery-slots/create', component: DeliverySlotCreateComponent },
       { path: 'delivery-slots/edit/:id', component: DeliverySlotCreateComponent },
       { path: 'delivery-slots/view/:id', component: DeliverySlotCreateComponent },
+      /* ================= DELIVERY ================= */
+{ path: 'delivery', component: DeliveryListComponent },
+{ path: 'delivery/view/:id', component: DeliveryFormComponent },
+{ path: 'delivery/edit/:id', component: DeliveryFormComponent },
+       /* ===== DRIVERS ===== */
+    { path: 'drivers', component: DriverListComponent },
+    { path: 'drivers/create', component: DriverFormComponent },
+    { path: 'drivers/edit/:id', component: DriverFormComponent },
+    { path: 'drivers/view/:id', component: DriverFormComponent },
+    /* ================= LOGISTICS ================= */
+
+{
+  path: 'logistics/list',
+  loadComponent: () =>
+    import('./logistics/logistics-list.component')
+      .then(m => m.LogisticsListComponent)
+},
+
+{
+  path: 'logistics/assign/:productId',
+  loadComponent: () =>
+    import('./logistics/logistics-assign.component')
+      .then(m => m.LogisticsAssignComponent)
+},
+
+{
+  path: 'logistics/view/:id',
+  loadComponent: () =>
+    import('./logistics/logistics-assign.component')
+      .then(m => m.LogisticsAssignComponent)
+},
+
+{
+  path: 'logistics/edit/:id',
+  loadComponent: () =>
+    import('./logistics/logistics-assign.component')
+      .then(m => m.LogisticsAssignComponent)
+},
+
+{
+  path: 'logistics/tracking',
+  loadComponent: () =>
+    import('./logistics/logistics-tracking.component')
+      .then(m => m.LogisticsTrackingComponent)
+},
 
       /* Default dashboard route */
       { path: '', redirectTo: 'warehouses', pathMatch: 'full' }

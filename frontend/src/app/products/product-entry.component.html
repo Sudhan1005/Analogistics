@@ -1,7 +1,9 @@
 <div class="warehouse-bg">
-  <div class="warehouse-content">
+  <div class="warehouse-content d-flex justify-content-center align-items-center">
 
-    <div class="warehouse-card shadow">
+    <!-- CENTERED CARD -->
+    <div class="warehouse-card shadow"
+         style="width: 100%; max-width: 900px;">
 
       <!-- HEADER -->
       <h4 class="mb-4 text-center">
@@ -93,7 +95,7 @@
                  required>
         </div>
 
-        <!-- Order Date & Time -->
+        <!-- Order Date / Time -->
         <div class="row">
           <div class="col-md-6 mb-3">
             <label class="form-label">Order Date</label>
@@ -116,7 +118,7 @@
           </div>
         </div>
 
-        <!-- Delivery Date & Time -->
+        <!-- Delivery Date / Time -->
         <div class="row">
           <div class="col-md-6 mb-3">
             <label class="form-label">Delivery Date</label>
@@ -155,7 +157,7 @@
         </div>
 
         <!-- ACTION BUTTONS -->
-        <div class="d-flex gap-2 justify-content-center">
+        <div class="d-flex justify-content-center gap-3">
           <button type="submit"
                   class="btn btn-primary px-4"
                   *ngIf="!isViewMode">

@@ -1,117 +1,141 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { DataService } from '../services/data.service';
 
 @Component({
   selector: 'app-delivery-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './delivery-list.component.html'
 })
 export class DeliveryListComponent implements OnInit, OnDestroy {
 
   deliveries: any[] = [];
+  drivers: any[] = [];
+  slots: any[] = [];
 
-  // 🔥 Used to trigger live countdown update
-  now: Date = new Date();
-  intervalId: any;
+  private timer: any;
 
   constructor(
     private dataService: DataService,
     private router: Router
   ) {}
 
-  /* ===================== INIT ===================== */
-
   ngOnInit(): void {
-    this.loadDeliveries();
+    this.loadAll();
 
-    // 🔁 update remaining time every second
-    this.intervalId = setInterval(() => {
-      this.now = new Date();
-    }, 1000);
+    // refresh remaining time every second
+    this.timer = setInterval(() => {}, 1000);
   }
 
   ngOnDestroy(): void {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
+    if (this.timer) {
+      clearInterval(this.timer);
     }
   }
 
-  /* ===================== DATA ===================== */
+  /* LOAD DATA */
+  loadAll(): void {
+    this.dataService.getDrivers()
+      .subscribe(r => this.drivers = r || []);
 
-  loadDeliveries() {
-    // Only OUTBOUND products appear here
-    this.dataService.getOutboundProductsForDelivery()
-      .subscribe(res => {
-        this.deliveries = res;
-      });
+    this.dataService.getDeliverySlots()
+      .subscribe(r => this.slots = r || []);
+
+    this.dataService.getDeliveryList()
+      .subscribe(r => this.deliveries = r || []);
   }
 
-  /* ===================== STATUS BADGE ===================== */
+  /* ASSIGN DELIVERY */
+  assign(d: any): void {
+    if (!d.driver_id || !d.delivery_slot_id) {
+      alert('Please select both driver and delivery slot');
+      return;
+    }
 
+    this.dataService.assignDelivery(d.id, {
+      driver_id: d.driver_id,
+      delivery_slot_id: d.delivery_slot_id
+    }).subscribe(() => {
+      this.loadAll();
+    });
+  }
+
+  /* CHECK ASSIGNMENT */
+  isAssigned(d: any): boolean {
+  return d.status === 'Driver Assigned';
+}
+
+  /* STATUS BADGE */
   getStatusClass(status: string): string {
     switch (status) {
-      case 'Inbound': return 'bg-info';
-      case 'Outbound': return 'bg-secondary';
-      case 'Storage': return 'bg-warning text-dark';
-      case 'Delivery Assigned': return 'bg-primary';
-      case 'Out for Delivery': return 'bg-dark';
-      case 'Driver Yet to Assign': return 'bg-danger';
-      case 'Driver Assigned': return 'bg-secondary';
-      case 'Logistics Ongoing': return 'bg-warning text-dark';
-      case 'Delivered': return 'bg-success';
-      default: return 'bg-light text-dark';
+      case 'Driver Assigned':
+        return 'bg-primary';
+
+      case 'Outbound':
+        return 'bg-secondary';
+
+      case 'Out for Delivery':
+        return 'bg-dark';
+
+      case 'Delivered':
+        return 'bg-success';
+
+      default:
+        return 'bg-light text-dark';
     }
   }
 
-  // ===============================
-  // ⏳ LIVE REMAINING TIME
-  // ===============================
-  getRemainingTime(p: any): string {
-    if (!p.delivery_date || !p.delivery_time) return '-';
+  /* REMAINING TIME */
+  getRemainingTime(d: any): string {
+    if (!d.delivery_date) return '-';
 
-    const now = new Date();
-    const delivery = new Date(`${p.delivery_date}T${p.delivery_time}`);
+    const dateTime = d.delivery_time
+      ? new Date(`${d.delivery_date}T${d.delivery_time}`)
+      : new Date(`${d.delivery_date}T23:59:59`);
 
-    let diffMs = delivery.getTime() - now.getTime();
+    const diffMs = dateTime.getTime() - Date.now();
+    if (diffMs <= 0) return 'Expired';
 
-    const isOverdue = diffMs < 0;
-    diffMs = Math.abs(diffMs);
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
 
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diffMs / (1000 * 60)) % 60);
-    const seconds = Math.floor((diffMs / 1000) % 60);
-
-    let time = '';
-    if (days > 0) time += `${days}d `;
-    if (hours > 0 || days > 0) time += `${hours}h `;
-    time += `${minutes}m ${seconds}s`;
-
-    return isOverdue ? `Overdue by ${time}` : `${time} left`;
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
   }
 
-  getRemainingClass(p: any): string {
-    if (!p.delivery_date || !p.delivery_time) return 'badge bg-secondary';
+  getRemainingClass(d: any): string {
+    if (!d.delivery_date) return '';
 
-    const now = new Date();
-    const delivery = new Date(`${p.delivery_date}T${p.delivery_time}`);
-    const diffHrs = (delivery.getTime() - now.getTime()) / (1000 * 60 * 60);
+    const dateTime = d.delivery_time
+      ? new Date(`${d.delivery_date}T${d.delivery_time}`)
+      : new Date(`${d.delivery_date}T23:59:59`);
 
-    if (diffHrs < 0) return 'badge bg-danger';              // ❌ overdue
-    if (diffHrs <= 24) return 'badge bg-warning text-dark'; // ⚠️ urgent
-    return 'badge bg-success';                              // ✅ safe
+    const diff = dateTime.getTime() - Date.now();
+
+    if (diff <= 0) return 'text-danger fw-bold';
+    if (diff <= 3600000) return 'text-danger fw-bold';      // < 1 hour
+    if (diff <= 86400000) return 'text-warning fw-bold';    // < 1 day
+    return 'text-success fw-bold';
   }
 
-  /* ===================== ACTIONS ===================== */
+  /* ACTIONS */
+  viewDelivery(id: number): void {
+    this.router.navigate(['/dashboard/delivery/view', id]);
+  }
 
-  deleteDelivery(id: number) {
-    if (confirm('Delete this delivery record?')) {
-      this.dataService.deleteDelivery(id).subscribe(() => {
-        this.loadDeliveries();
-      });
-    }
+  editDelivery(id: number): void {
+    this.router.navigate(['/dashboard/delivery/edit', id]);
+  }
+
+  deleteDelivery(id: number): void {
+    if (!confirm('Delete this delivery?')) return;
+
+    this.dataService.deleteDelivery(id)
+      .subscribe(() => this.loadAll());
   }
 }

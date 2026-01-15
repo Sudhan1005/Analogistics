@@ -1,0 +1,44 @@
+<div class="warehouse-bg">
+  <div class="warehouse-content">
+
+    <div class="warehouse-card shadow">
+      <h4 class="mb-3">Driver List</h4>
+
+      <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>Phone</th>
+            <th>Govt ID</th>
+            <th>Status</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let d of drivers; index as i">
+            <td>{{ i+1 }}</td>
+            <td>{{ d.driver_name }}</td>
+            <td>{{ d.gender }}</td>
+            <td>{{ d.phone }}</td>
+            <td>{{ d.govt_id_type }} - {{ d.govt_id_number }}</td>
+            <td>
+              <span class="badge"
+                    [ngClass]="getStatusClass(d.status)">
+                {{ d.status }}
+              </span>
+            </td>
+            <td class="text-center">
+              <i class="bi bi-eye" (click)="view(d.id)"></i>
+              <i class="bi bi-pencil mx-2" (click)="edit(d.id)"></i>
+              <i class="bi bi-trash" (click)="remove(d.id)"></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>

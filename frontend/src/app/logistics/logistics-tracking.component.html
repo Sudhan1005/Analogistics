@@ -1,0 +1,19 @@
+<div class="warehouse-bg p-4">
+  <div class="row g-3">
+
+    <div class="col-md-4" *ngFor="let c of cards">
+      <div class="card shadow p-3">
+        <h5>{{ c.product_name }}</h5>
+
+        <p><b>Driver:</b> {{ c.driver_name }} ({{ c.phone }})</p>
+        <p><b>Vehicle:</b> {{ c.vehicle_number }}</p>
+        <p><b>Slot:</b> {{ c.slot_name }} ({{ c.start_time }} - {{ c.end_time }})</p>
+
+        <div class="badge bg-success fs-6">
+          {{ getRemainingTime(c) }}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

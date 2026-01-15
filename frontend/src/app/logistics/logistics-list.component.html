@@ -1,0 +1,123 @@
+<div class="warehouse-bg">
+  <div class="warehouse-content">
+    <div class="container-fluid">
+      <div class="warehouse-card shadow">
+
+        <h4 class="mb-3">Assigned Logistics</h4>
+
+        <div class="table-responsive" style="max-height:70vh;">
+          <table class="table table-bordered table-hover table-sm text-nowrap">
+
+            <thead class="table-dark sticky-top">
+              <tr>
+                <th>#</th>
+                <th>Warehouse</th>
+                <th>Zone</th>
+                <th>Product</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Qty</th>
+                <th>Delivery Date</th>
+
+                <!-- LOGISTICS -->
+                <th>Transport</th>
+                <th>Vehicle Type</th>
+                <th>Vehicle No</th>
+
+                <th>Status</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let l of list; index as i">
+                <td>{{ i + 1 }}</td>
+                <td>{{ l.warehouse_name }}</td>
+                <td>{{ l.zone_name }}</td>
+                <td>{{ l.product_name }}</td>
+                <td>{{ l.product_type }}</td>
+                <td>{{ l.product_category }}</td>
+                <td>{{ l.quantity }}</td>
+                <td>{{ l.delivery_date }}</td>
+
+                <!-- TRANSPORT TYPE -->
+                <td>
+                  <select class="form-select form-select-sm"
+                          [(ngModel)]="l.transport_type">
+                    <option value="">Select</option>
+                    <option *ngFor="let t of transportTypes">{{ t }}</option>
+                  </select>
+                </td>
+
+                <!-- VEHICLE TYPE -->
+                <td>
+                  <select class="form-select form-select-sm"
+                          [(ngModel)]="l.vehicle_type">
+                    <option value="">Select</option>
+                    <option *ngFor="let v of vehicleTypes">{{ v }}</option>
+                  </select>
+                </td>
+
+                <!-- VEHICLE NUMBER -->
+                <td>
+                  <input class="form-control form-control-sm"
+                         [(ngModel)]="l.vehicle_number"
+                         placeholder="TN 09 AB 1234">
+                </td>
+
+                <td>
+                  <span class="badge"
+                        [ngClass]="getStatusClass(l.status)">
+                    {{ l.status }}
+                  </span>
+                </td>
+
+                <td class="text-center">
+
+  <!-- SAVE (only before logistics is completed) -->
+  <ng-container *ngIf="canShowSave(l)">
+    <button class="btn btn-sm btn-success"
+            (click)="save(l)">
+      Save
+    </button>
+  </ng-container>
+
+  <!-- AFTER SAVE → EDIT / VIEW / DELETE -->
+  <ng-container *ngIf="isLogisticsSaved(l)">
+    <i class="bi bi-eye-fill text-info me-2"
+       role="button"
+       title="View"
+       (click)="view(l.delivery_id)">
+    </i>
+
+    <i class="bi bi-pencil-fill text-warning me-2"
+       role="button"
+       title="Edit"
+       (click)="edit(l.delivery_id)">
+    </i>
+
+    <i class="bi bi-trash-fill text-danger"
+       role="button"
+       title="Delete"
+       (click)="delete(l.delivery_id)">
+    </i>
+  </ng-container>
+
+</td>
+              </tr>
+
+              <tr *ngIf="list.length === 0">
+                <td colspan="13"
+                    class="text-center text-danger py-3">
+                  No logistics assigned
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -310,7 +310,6 @@ def get_product(product_id):
 @app.route('/api/products/<int:product_id>', methods=['PUT'])
 def update_product(product_id):
     data = request.json
-
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -323,9 +322,9 @@ def update_product(product_id):
             product_category=%s,
             quantity=%s,
             order_date=%s,
-            order_time=%s,
             delivery_date=%s,
-            delivery_time=%s,
+            driver_id=%s,
+            delivery_slot_id=%s,
             status=%s
         WHERE id=%s
     """, (
@@ -336,18 +335,33 @@ def update_product(product_id):
         data['product_category'],
         data['quantity'],
         data['order_date'],
-        data['order_time'],
         data['delivery_date'],
-        data['delivery_time'],
+        data.get('driver_id'),
+        data.get('delivery_slot_id'),
         data['status'],
         product_id
     ))
+
+    # 🔁 DRIVER STATUS SYNC
+    if data.get('driver_id'):
+        if data['status'] in ('Driver Assigned', 'Out for Delivery', 'Logistics Ongoing'):
+            cursor.execute("""
+                UPDATE drivers
+                SET status='Busy'
+                WHERE id=%s
+            """, (data['driver_id'],))
+        else:
+            cursor.execute("""
+                UPDATE drivers
+                SET status='Available'
+                WHERE id=%s
+            """, (data['driver_id'],))
 
     conn.commit()
     cursor.close()
     conn.close()
 
-    return jsonify({"message": "Product updated"}), 200
+    return jsonify({"message": "Delivery updated"}), 200
     
 @app.route('/api/products/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
@@ -375,20 +389,62 @@ def get_delivery_list():
             p.*,
             w.name AS warehouse_name,
             z.zone_name,
-            z.zone_type
+            z.zone_type,
+            d.driver_name,
+            CONCAT(
+              s.slot_name,' (',s.start_time,'-',s.end_time,')'
+            ) AS delivery_slot
         FROM warehouse_products p
         JOIN warehouses w ON p.warehouse_id = w.id
         LEFT JOIN warehouse_zones z ON p.zone_id = z.id
-        WHERE p.status = 'Outbound'
-        ORDER BY p.delivery_date ASC
+        LEFT JOIN drivers d ON p.driver_id = d.id
+        LEFT JOIN delivery_slots s ON p.delivery_slot_id = s.id
+        WHERE p.status IN (
+  'Outbound',
+  'Driver Yet to Assign',
+  'Driver Assigned'
+)
+        ORDER BY p.id DESC
     """)
 
     data = cursor.fetchall()
     cursor.close()
     conn.close()
 
-    data = [serialize_row(d) for d in data]
-    return jsonify(data), 200
+    return jsonify([serialize_row(d) for d in data]), 200
+
+@app.route('/api/delivery/assign/<int:product_id>', methods=['PUT'])
+def assign_delivery(product_id):
+    data = request.json
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # update product
+    cursor.execute("""
+        UPDATE warehouse_products
+        SET driver_id=%s,
+            delivery_slot_id=%s,
+            status='Driver Assigned'
+        WHERE id=%s
+    """, (
+        data['driver_id'],
+        data['delivery_slot_id'],
+        product_id
+    ))
+
+    # update driver status
+    cursor.execute("""
+        UPDATE drivers
+        SET status='Driver Assigned'
+        WHERE id=%s
+    """, (data['driver_id'],))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({'message': 'Delivery assigned'}), 200
 
 @app.route('/api/logistics', methods=['GET'])
 def get_logistics_list():
@@ -520,6 +576,205 @@ def delete_delivery_slot(id):
     conn.close()
 
     return jsonify({"message": "Delivery slot deleted"}), 200
+
+# ================== DRIVERS ==================
+
+@app.route('/api/drivers', methods=['GET'])
+def get_drivers():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+            d.id,
+            d.driver_name,
+            d.gender,
+            d.phone,
+            CONCAT(d.govt_id_type, ' - ', d.govt_id_number) AS govt_id,
+            CASE
+                WHEN EXISTS (
+                    SELECT 1 FROM warehouse_products p
+                    WHERE p.driver_id = d.id
+                    AND p.status IN (
+                        'Driver Assigned',
+                        'Out for Delivery',
+                        'Logistics Ongoing'
+                    )
+                )
+                THEN 'Assigned'
+                ELSE 'Available'
+            END AS status
+        FROM drivers d
+        ORDER BY d.id DESC
+    """)
+
+    drivers = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return jsonify(drivers), 200
+
+@app.route('/api/drivers/<int:id>', methods=['GET'])
+def get_driver(id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM drivers WHERE id=%s", (id,))
+    driver = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+    return jsonify(driver), 200
+
+
+@app.route('/api/drivers/<int:id>', methods=['PUT'])
+def update_driver(id):
+    data = request.json
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE drivers SET
+          driver_name=%s,
+          gender=%s,
+          email=%s,
+          phone=%s,
+          last_company=%s,
+          govt_id_type=%s,
+          govt_id_number=%s
+        WHERE id=%s
+    """, (
+        data['driver_name'],
+        data['gender'],
+        data.get('email'),
+        data.get('phone'),
+        data.get('last_company'),
+        data['govt_id_type'],
+        data['govt_id_number'],
+        id
+    ))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({'message': 'Driver updated'}), 200
+
+
+@app.route('/api/drivers/<int:id>', methods=['DELETE'])
+def delete_driver(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM drivers WHERE id=%s", (id,))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+    return jsonify({'message': 'Driver deleted'}), 200
+
+@app.route('/api/logistics', methods=['POST'])
+def assign_logistics():
+    data = request.json
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO logistics_assignments
+        (product_id, driver_id, delivery_slot_id,
+         from_warehouse_id, from_zone_id,
+         to_warehouse_id, to_zone_id,
+         transport_type, vehicle_number)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    """, (
+        data['product_id'],
+        data['driver_id'],
+        data['delivery_slot_id'],
+        data['from_warehouse_id'],
+        data['from_zone_id'],
+        data['to_warehouse_id'],
+        data['to_zone_id'],
+        data['transport_type'],
+        data['vehicle_number']
+    ))
+
+    # 🔁 UPDATE PRODUCT STATUS
+    cur.execute("""
+        UPDATE warehouse_products
+        SET status = 'Logistics Ongoing'
+        WHERE id = %s
+    """, (data['product_id'],))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return jsonify({'message': 'Logistics Assigned'}), 201
+
+@app.route('/api/logistics', methods=['GET'])
+def logistics_list():
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT 
+          l.*,
+          p.product_name,
+          d.driver_name,
+          fw.name AS from_warehouse,
+          tw.name AS to_warehouse,
+          fs.zone_name AS from_zone,
+          ts.zone_name AS to_zone
+        FROM logistics_assignments l
+        JOIN warehouse_products p ON l.product_id = p.id
+        JOIN drivers d ON l.driver_id = d.id
+        JOIN warehouses fw ON l.from_warehouse_id = fw.id
+        JOIN warehouses tw ON l.to_warehouse_id = tw.id
+        JOIN warehouse_zones fs ON l.from_zone_id = fs.id
+        JOIN warehouse_zones ts ON l.to_zone_id = ts.id
+        ORDER BY l.id DESC
+    """)
+
+    data = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return jsonify(data), 200
+
+@app.route('/api/logistics/tracking', methods=['GET'])
+def logistics_tracking():
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT 
+          p.product_name,
+          d.driver_name,
+          d.phone,
+          l.transport_type,
+          l.vehicle_number,
+          s.slot_name,
+          s.start_time,
+          s.end_time,
+          fw.name AS from_warehouse,
+          tw.name AS to_warehouse,
+          p.delivery_date,
+          p.delivery_time
+        FROM logistics_assignments l
+        JOIN warehouse_products p ON l.product_id = p.id
+        JOIN drivers d ON l.driver_id = d.id
+        JOIN delivery_slots s ON l.delivery_slot_id = s.id
+        JOIN warehouses fw ON l.from_warehouse_id = fw.id
+        JOIN warehouses tw ON l.to_warehouse_id = tw.id
+        WHERE p.status = 'Logistics Ongoing'
+    """)
+
+    data = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return jsonify(data), 200
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":

@@ -1,0 +1,164 @@
+<div class="warehouse-bg">
+  <div class="warehouse-content d-flex justify-content-center align-items-center">
+
+    <div class="warehouse-card shadow"
+         style="max-width: 1000px; width: 100%;">
+
+      <h4 class="text-center mb-4">
+        {{ isEdit ? 'Edit Delivery' : 'View Delivery' }}
+      </h4>
+
+      <!-- RENDER ONLY WHEN DATA IS READY -->
+      <form *ngIf="delivery">
+
+        <!-- WAREHOUSE -->
+        <div class="mb-3">
+          <label>Warehouse</label>
+          <select class="form-select"
+                  [(ngModel)]="delivery.warehouse_id"
+                  name="warehouse_id"
+                  (change)="onWarehouseChange()"
+                  [disabled]="isView">
+            <option *ngFor="let w of warehouses"
+                    [value]="w.id">
+              {{ w.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- ZONE -->
+        <div class="mb-3">
+          <label>Zone</label>
+          <select class="form-select"
+                  [(ngModel)]="delivery.zone_id"
+                  name="zone_id"
+                  [disabled]="isView">
+            <option *ngFor="let z of zones"
+                    [value]="z.id">
+              {{ z.zone_name }} ({{ z.zone_type }})
+            </option>
+          </select>
+        </div>
+
+        <!-- PRODUCT DETAILS -->
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>Product Name</label>
+            <input class="form-control"
+                   [(ngModel)]="delivery.product_name"
+                   name="product_name"
+                   [disabled]="isView">
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>Product Type</label>
+            <input class="form-control"
+                   [(ngModel)]="delivery.product_type"
+                   name="product_type"
+                   [disabled]="isView">
+          </div>
+
+          <div class="col-md-3 mb-3">
+            <label>Product Category</label>
+            <input class="form-control"
+                   [(ngModel)]="delivery.product_category"
+                   name="product_category"
+                   [disabled]="isView">
+          </div>
+        </div>
+
+        <!-- QUANTITY -->
+        <div class="mb-3">
+          <label>Quantity</label>
+          <input type="number"
+                 class="form-control"
+                 [(ngModel)]="delivery.quantity"
+                 name="quantity"
+                 [disabled]="isView">
+        </div>
+
+        <!-- DATES -->
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>Order Date</label>
+            <input type="date"
+                   class="form-control"
+                   [(ngModel)]="delivery.order_date"
+                   name="order_date"
+                   [disabled]="isView">
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label>Delivery Date</label>
+            <input type="date"
+                   class="form-control"
+                   [(ngModel)]="delivery.delivery_date"
+                   name="delivery_date"
+                   [disabled]="isView">
+          </div>
+        </div>
+
+        <!-- DRIVER -->
+        <div class="mb-3">
+          <label>Driver</label>
+          <select class="form-select"
+                  [(ngModel)]="delivery.driver_id"
+                  name="driver_id"
+                  [disabled]="isView">
+            <option *ngFor="let d of drivers"
+                    [value]="d.id">
+              {{ d.driver_name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- DELIVERY SLOT -->
+        <div class="mb-3">
+          <label>Delivery Slot</label>
+          <select class="form-select"
+                  [(ngModel)]="delivery.delivery_slot_id"
+                  name="delivery_slot_id"
+                  [disabled]="isView">
+            <option *ngFor="let s of slots"
+                    [value]="s.id">
+              {{ s.slot_name }} ({{ s.start_time }} - {{ s.end_time }})
+            </option>
+          </select>
+        </div>
+
+        <!-- STATUS -->
+<div class="mb-4">
+  <label>Status</label>
+  <select class="form-select"
+          [(ngModel)]="delivery.status"
+          name="status"
+          [disabled]="isView">
+    <option *ngFor="let s of statuses"
+            [value]="s">
+      {{ s }}
+    </option>
+  </select>
+</div>
+
+        <!-- ACTIONS -->
+        <div class="d-flex justify-content-center gap-3">
+          <button *ngIf="isEdit"
+                  class="btn btn-primary"
+                  type="button"
+                  (click)="update()">
+            Update
+          </button>
+
+          <button type="button"
+                  class="btn btn-secondary"
+                  (click)="back()">
+            Back
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+</div>
