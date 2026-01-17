@@ -132,10 +132,18 @@ export class DeliveryListComponent implements OnInit, OnDestroy {
     this.router.navigate(['/dashboard/delivery/edit', id]);
   }
 
-  deleteDelivery(id: number): void {
-    if (!confirm('Delete this delivery?')) return;
-
-    this.dataService.deleteDelivery(id)
-      .subscribe(() => this.loadAll());
+ delete(id: number): void {
+  if (confirm('Are you sure you want to delete this delivery?')) {
+    this.dataService.deleteProduct(id).subscribe({
+      next: () => {
+        alert('Delivery deleted successfully');
+        this.loadAll(); // reload delivery list
+      },
+      error: (err: any) => {
+        console.error(err);
+        alert('Delete failed');
+      }
+    });
   }
+}
 }

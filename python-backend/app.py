@@ -446,30 +446,6 @@ def assign_delivery(product_id):
 
     return jsonify({'message': 'Delivery assigned'}), 200
 
-@app.route('/api/logistics', methods=['GET'])
-def get_logistics_list():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT 
-            p.*,
-            w.name AS warehouse_name,
-            z.zone_name,
-            z.zone_type
-        FROM warehouse_products p
-        JOIN warehouses w ON p.warehouse_id = w.id
-        LEFT JOIN warehouse_zones z ON p.zone_id = z.id
-        WHERE p.status = 'Out for Delivery'
-        ORDER BY p.delivery_date ASC
-    """)
-
-    data = cursor.fetchall()
-    cursor.close()
-    conn.close()
-
-    data = [serialize_row(d) for d in data]
-    return jsonify(data), 200
 # ================= DELIVERY SLOTS =================
 
 @app.route('/api/delivery-slots', methods=['GET'])
@@ -674,107 +650,143 @@ def delete_driver(id):
     conn.close()
     return jsonify({'message': 'Driver deleted'}), 200
 
-@app.route('/api/logistics', methods=['POST'])
-def assign_logistics():
-    data = request.json
+@app.route('/api/logistics', methods=['GET'])
+def get_logistics_list():
     conn = get_db_connection()
-    cur = conn.cursor()
+    cur = conn.cursor(dictionary=True)
 
     cur.execute("""
-        INSERT INTO logistics_assignments
-        (product_id, driver_id, delivery_slot_id,
-         from_warehouse_id, from_zone_id,
-         to_warehouse_id, to_zone_id,
-         transport_type, vehicle_number)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        SELECT
+            p.id,
+            p.product_name,
+            p.product_type,
+            p.product_category,
+            p.quantity,
+            p.delivery_date,
+
+            w.name AS warehouse_name,
+            z.zone_name,
+
+            l.id AS logistics_id,
+            l.transport_type,
+            l.vehicle_type,
+            l.vehicle_number
+
+        FROM warehouse_products p
+        JOIN warehouses w ON p.warehouse_id = w.id
+        LEFT JOIN warehouse_zones z ON p.zone_id = z.id
+        LEFT JOIN logistics_assignments l ON l.product_id = p.id
+
+        WHERE p.status = 'Out for Delivery'
+        ORDER BY p.delivery_date ASC
+    """)
+
+    data = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return jsonify(data), 200
+
+@app.route('/api/logistics', methods=['POST'])
+def save_logistics():
+    data = request.json
+    product_id = data['product_id']
+
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    # 1️⃣ Get delivery / product details
+    cur.execute("""
+        SELECT warehouse_id, zone_id
+        FROM warehouse_products
+        WHERE id = %s
+    """, (product_id,))
+    product = cur.fetchone()
+
+    if not product:
+        return jsonify({'message': 'Product not found'}), 404
+
+    # 2️⃣ Insert logistics assignment
+    cur.execute("""
+        INSERT INTO logistics_assignments (
+            product_id,
+            from_warehouse_id,
+            from_zone_id,
+            transport_type,
+            vehicle_type,
+            vehicle_number,
+            status
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
     """, (
-        data['product_id'],
-        data['driver_id'],
-        data['delivery_slot_id'],
-        data['from_warehouse_id'],
-        data['from_zone_id'],
-        data['to_warehouse_id'],
-        data['to_zone_id'],
+        product_id,
+        product['warehouse_id'],
+        product['zone_id'],
         data['transport_type'],
-        data['vehicle_number']
+        data['vehicle_type'],
+        data['vehicle_number'],
+        'Out for Delivery'
     ))
 
-    # 🔁 UPDATE PRODUCT STATUS
+    # 3️⃣ Update product status
     cur.execute("""
         UPDATE warehouse_products
-        SET status = 'Logistics Ongoing'
+        SET status = 'Out for Delivery'
         WHERE id = %s
-    """, (data['product_id'],))
+    """, (product_id,))
 
     conn.commit()
     cur.close()
     conn.close()
 
-    return jsonify({'message': 'Logistics Assigned'}), 201
+    return jsonify({'message': 'Logistics saved successfully'}), 201
 
-@app.route('/api/logistics', methods=['GET'])
-def logistics_list():
+@app.route('/api/logistics/<int:product_id>', methods=['PUT'])
+def update_logistics(product_id):
+    data = request.json
+
     conn = get_db_connection()
-    cur = conn.cursor(dictionary=True)
+    cur = conn.cursor()
 
     cur.execute("""
-        SELECT 
-          l.*,
-          p.product_name,
-          d.driver_name,
-          fw.name AS from_warehouse,
-          tw.name AS to_warehouse,
-          fs.zone_name AS from_zone,
-          ts.zone_name AS to_zone
-        FROM logistics_assignments l
-        JOIN warehouse_products p ON l.product_id = p.id
-        JOIN drivers d ON l.driver_id = d.id
-        JOIN warehouses fw ON l.from_warehouse_id = fw.id
-        JOIN warehouses tw ON l.to_warehouse_id = tw.id
-        JOIN warehouse_zones fs ON l.from_zone_id = fs.id
-        JOIN warehouse_zones ts ON l.to_zone_id = ts.id
-        ORDER BY l.id DESC
-    """)
+        UPDATE logistics_assignments
+        SET transport_type=%s,
+            vehicle_type=%s,
+            vehicle_number=%s
+        WHERE product_id=%s
+    """, (
+        data['transport_type'],
+        data['vehicle_type'],
+        data['vehicle_number'],
+        product_id
+    ))
 
-    data = cur.fetchall()
+    conn.commit()
     cur.close()
     conn.close()
 
-    return jsonify(data), 200
+    return jsonify({'message': 'Logistics updated'}), 200
 
-@app.route('/api/logistics/tracking', methods=['GET'])
-def logistics_tracking():
+@app.route('/api/logistics/<int:product_id>', methods=['DELETE'])
+def delete_logistics(product_id):
     conn = get_db_connection()
-    cur = conn.cursor(dictionary=True)
+    cur = conn.cursor()
 
-    cur.execute("""
-        SELECT 
-          p.product_name,
-          d.driver_name,
-          d.phone,
-          l.transport_type,
-          l.vehicle_number,
-          s.slot_name,
-          s.start_time,
-          s.end_time,
-          fw.name AS from_warehouse,
-          tw.name AS to_warehouse,
-          p.delivery_date,
-          p.delivery_time
-        FROM logistics_assignments l
-        JOIN warehouse_products p ON l.product_id = p.id
-        JOIN drivers d ON l.driver_id = d.id
-        JOIN delivery_slots s ON l.delivery_slot_id = s.id
-        JOIN warehouses fw ON l.from_warehouse_id = fw.id
-        JOIN warehouses tw ON l.to_warehouse_id = tw.id
-        WHERE p.status = 'Logistics Ongoing'
-    """)
+    cur.execute(
+        "DELETE FROM logistics_assignments WHERE product_id=%s",
+        (product_id,)
+    )
 
-    data = cur.fetchall()
+    cur.execute(
+        "UPDATE warehouse_products SET status='Driver Assigned' WHERE id=%s",
+        (product_id,)
+    )
+
+    conn.commit()
     cur.close()
     conn.close()
 
-    return jsonify(data), 200
+    return jsonify({'message': 'Logistics deleted'}), 200
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":

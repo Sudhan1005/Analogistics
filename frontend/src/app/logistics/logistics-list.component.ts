@@ -1,21 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Router,RouterModule } from '@angular/router';
 import { DataService } from '../services/data.service';
 
 @Component({
-  selector: 'app-logistics-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
-  templateUrl: './logistics-list.component.html'
+  selector: 'app-logistics-list',
+  templateUrl: './logistics-list.component.html',
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule   // 🚨 REQUIRED
+  ]
 })
 export class LogisticsListComponent implements OnInit {
 
   list: any[] = [];
 
-  transportTypes = ['Roadways', 'Railways', 'Seaway', 'Airway'];
-  vehicleTypes = ['Truck', 'Van', 'Container', 'Ship', 'Flight', 'Train'];
+  transportTypes = ['Roadways', 'Railways', 'Airways', 'Seaways'];
+  vehicleTypes = ['Truck', 'Van', 'Container', 'Mini Truck','train'];
 
   constructor(
     private dataService: DataService,
@@ -26,54 +30,69 @@ export class LogisticsListComponent implements OnInit {
     this.load();
   }
 
-  load() {
-    this.dataService.getLogisticsList()
-      .subscribe((res: any[]) => this.list = res);
-  }
+  /* ================= LOAD LIST ================= */
+  load(): void {
+  this.dataService.getLogisticsList().subscribe({
+    next: res => {
+      console.log('LOGISTICS API RESPONSE:', res); // 👈 DEBUG
+      this.list = res.map(r => ({
+        ...r,
+        is_logistics_assigned: !!r.logistics_id
+      }));
+    },
+    error: err => console.error(err)
+  });
+}
+  /* ================= SAVE (FIRST TIME) ================= */
+  save(l: any): void {
 
-  save(l: any) {
-    this.dataService.updateLogistics(l.delivery_id, {
+    if (!l.transport_type || !l.vehicle_type || !l.vehicle_number) {
+      alert('Please fill Transport, Vehicle Type and Vehicle Number');
+      return;
+    }
+
+    const payload = {
+      product_id: l.id,            // 🔑 VERY IMPORTANT
       transport_type: l.transport_type,
       vehicle_type: l.vehicle_type,
       vehicle_number: l.vehicle_number
-    }).subscribe(() => {
-      alert('Logistics updated');
-      this.load();
+    };
+
+    this.dataService.saveLogistics(payload).subscribe({
+      next: () => {
+        alert('Logistics saved successfully');
+        this.load(); // refresh list
+      },
+      error: (err: any) => {
+        console.error(err);
+        alert('Save failed');
+      }
     });
   }
 
-  view(id: number) {
-    this.router.navigate(['/dashboard/logistics/view', id]);
+  /* ================= ACTIONS ================= */
+  edit(productId: number): void {
+    this.router.navigate(['/dashboard/logistics/edit', productId]);
   }
 
-  edit(id: number) {
-    this.router.navigate(['/dashboard/logistics/edit', id]);
+  view(productId: number): void {
+    this.router.navigate(['/dashboard/logistics/view', productId]);
   }
 
-  delete(id: number) {
-    if (confirm('Remove logistics assignment?')) {
-      this.dataService.deleteLogistics(id)
-        .subscribe(() => this.load());
-    }
+  remove(productId: number): void {
+    if (!confirm('Delete logistics record?')) return;
+
+    this.dataService.deleteLogistics(productId).subscribe({
+      next: () => this.load(),
+      error: (err: any) => {
+        console.error(err);
+        alert('Delete failed');
+      }
+    });
   }
 
-  getStatusClass(status: string) {
-    switch (status) {
-      case 'Out for Delivery': return 'bg-dark';
-      case 'Logistics Ongoing': return 'bg-warning text-dark';
-      case 'Delivered': return 'bg-success';
-      default: return 'bg-secondary';
-    }
+  /* ================= HELPERS ================= */
+  getStatusClass(): string {
+    return 'bg-dark';
   }
-  isLogisticsSaved(l: any): boolean {
-  return !!(
-    l.transport_type &&
-    l.vehicle_type &&
-    l.vehicle_number
-  );
-}
-
-canShowSave(l: any): boolean {
-  return !this.isLogisticsSaved(l);
-}
 }

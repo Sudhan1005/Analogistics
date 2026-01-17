@@ -1,0 +1,50 @@
+<div class="warehouse-bg d-flex justify-content-center align-items-center">
+  <div class="card p-4 shadow" style="width:650px">
+
+    <h4 class="mb-3 text-center">
+      {{ mode === 'view' ? 'View Logistics' : 'Edit Logistics' }}
+    </h4>
+
+    <div class="mb-2">
+      <label>Product</label>
+      <input class="form-control" [value]="data.product_name" disabled>
+    </div>
+
+    <div class="mb-2">
+      <label>Driver</label>
+      <input class="form-control" [value]="data.driver_name" disabled>
+    </div>
+
+    <div class="mb-2">
+      <label>Transport Type</label>
+      <select class="form-select"
+              [(ngModel)]="data.transport_type"
+              [disabled]="mode==='view'">
+        <option *ngFor="let t of transportTypes">{{ t }}</option>
+      </select>
+    </div>
+
+    <div class="mb-2">
+      <label>Vehicle Type</label>
+      <select class="form-select"
+              [(ngModel)]="data.vehicle_type"
+              [disabled]="mode==='view'">
+        <option *ngFor="let v of vehicleTypes">{{ v }}</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label>Vehicle Number</label>
+      <input class="form-control"
+             [(ngModel)]="data.vehicle_number"
+             [disabled]="mode==='view'">
+    </div>
+
+    <button *ngIf="mode==='edit'"
+            class="btn btn-primary w-100"
+            (click)="save()">
+      Save
+    </button>
+
+  </div>
+</div>

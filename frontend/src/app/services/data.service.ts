@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class DataService {
@@ -10,25 +11,25 @@ export class DataService {
 
   /* ===================== WAREHOUSES ===================== */
 
-  getWarehouses() {
+  getWarehouses(): Observable<any[]> {
     return this.http.get<any[]>(`${this.api}/warehouses`);
   }
 
-  createWarehouse(data: any) {
-    return this.http.post(`${this.api}/warehouses`, data);
+  createWarehouse(data: any): Observable<any> {
+    return this.http.post<any>(`${this.api}/warehouses`, data);
   }
 
   /* ===================== ZONES ===================== */
 
-  createZone(zone: any) {
-    return this.http.post(`${this.api}/zones`, zone);
-  }
-
-  getZones() {
+  getZones(): Observable<any[]> {
     return this.http.get<any[]>(`${this.api}/zones`);
   }
 
-  getZonesByWarehouse(warehouseId: number) {
+  createZone(zone: any): Observable<any> {
+    return this.http.post<any>(`${this.api}/zones`, zone);
+  }
+
+  getZonesByWarehouse(warehouseId: number): Observable<any[]> {
     return this.http.get<any[]>(
       `${this.api}/zones/by-warehouse/${warehouseId}`
     );
@@ -36,170 +37,132 @@ export class DataService {
 
   /* ===================== PRODUCTS ===================== */
 
-  createProduct(product: any) {
-    return this.http.post(`${this.api}/products`, product);
+  createProduct(product: any): Observable<any> {
+    return this.http.post<any>(`${this.api}/products`, product);
   }
 
-  getProducts() {
+  getProducts(): Observable<any[]> {
     return this.http.get<any[]>(`${this.api}/products`);
   }
 
-  getProductById(id: number) {
+  getProductById(id: number): Observable<any> {
     return this.http.get<any>(`${this.api}/products/${id}`);
   }
 
-  updateProduct(id: number, product: any) {
-    return this.http.put(
-      `${this.api}/products/${id}`,
-      product
-    );
+  updateProduct(id: number, product: any): Observable<any> {
+    return this.http.put<any>(`${this.api}/products/${id}`, product);
   }
 
-  deleteProduct(id: number) {
-    return this.http.delete(
-      `${this.api}/products/${id}`
-    );
+  deleteProduct(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.api}/products/${id}`);
   }
 
   /* ===================== DELIVERY ===================== */
 
-  // Assign Delivery (Create)
-  createDelivery(delivery: any) {
-    return this.http.post(
-      `${this.api}/delivery`,
-      delivery
-    );
-  }
-
-  // Delivery List
-  getDeliveries() {
+  // ✅ Delivery List (Outbound / Driver Assigned / Yet to Assign)
+  getDeliveryList(): Observable<any[]> {
     return this.http.get<any[]>(
-      `${this.api}/delivery`
+      `${this.api}/delivery/products`
     );
   }
 
-  // Get Delivery by ID (Edit)
-  getDeliveryById(id: number) {
-    return this.http.get<any>(
-      `${this.api}/delivery/${id}`
+  // ✅ Assign driver + slot
+  assignDelivery(
+    productId: number,
+    data: { driver_id: number; delivery_slot_id: number }
+  ): Observable<any> {
+    return this.http.put<any>(
+      `${this.api}/delivery/assign/${productId}`,
+      data
     );
   }
 
-  // Update Delivery
-  updateDelivery(id: number, delivery: any) {
-    return this.http.put(
-      `${this.api}/delivery/${id}`,
-      delivery
+  /* ===================== DELIVERY SLOTS ===================== */
+
+  getDeliverySlots(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/delivery-slots`);
+  }
+
+  getDeliverySlotById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.api}/delivery-slots/${id}`);
+  }
+
+  createDeliverySlot(data: any): Observable<any> {
+    return this.http.post<any>(`${this.api}/delivery-slots`, data);
+  }
+
+  updateDeliverySlot(id: number, data: any): Observable<any> {
+    return this.http.put<any>(`${this.api}/delivery-slots/${id}`, data);
+  }
+
+  deleteDeliverySlot(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.api}/delivery-slots/${id}`);
+  }
+
+  /* ===================== DRIVERS ===================== */
+
+  getDrivers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/drivers`);
+  }
+
+  getDriverById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.api}/drivers/${id}`);
+  }
+
+  createDriver(data: any): Observable<any> {
+    return this.http.post<any>(`${this.api}/drivers`, data);
+  }
+
+  updateDriver(id: number, data: any): Observable<any> {
+    return this.http.put<any>(`${this.api}/drivers/${id}`, data);
+  }
+
+  deleteDriver(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.api}/drivers/${id}`);
+  }
+
+  /* ===================== LOGISTICS ===================== */
+
+  // ✅ Logistics List
+  // shows products whose status = "Out for Delivery"
+  getLogisticsList(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/logistics`);
+  }
+
+  // ✅ Get logistics data by product (Edit / View)
+  getLogisticsByProduct(productId: number): Observable<any> {
+    return this.http.get<any>(`${this.api}/logistics/${productId}`);
+  }
+
+  // ✅ First time logistics assign
+  saveLogistics(payload: {
+    product_id: number;
+    transport_type: string;
+    vehicle_type: string;
+    vehicle_number: string;
+  }): Observable<any> {
+    return this.http.post<any>(`${this.api}/logistics`, payload);
+  }
+
+  // ✅ Update logistics (Edit)
+  updateLogistics(
+    productId: number,
+    payload: {
+      transport_type: string;
+      vehicle_type: string;
+      vehicle_number: string;
+    }
+  ): Observable<any> {
+    return this.http.put<any>(
+      `${this.api}/logistics/${productId}`,
+      payload
     );
   }
 
-  // Delete Delivery
-  deleteDelivery(id: number) {
-    return this.http.delete(
-      `${this.api}/delivery/${id}`
+  // ✅ Delete logistics
+  deleteLogistics(productId: number): Observable<any> {
+    return this.http.delete<any>(
+      `${this.api}/logistics/${productId}`
     );
   }
-getOutboundProductsForDelivery() {
-  return this.http.get<any[]>(
-    `${this.api}/delivery/products`
-  );
-}
-/* Delivery Slots */
-getDeliverySlots() {
-  return this.http.get<any[]>(`${this.api}/delivery-slots`);
-}
-
-getDeliverySlotById(id: number) {
-  return this.http.get<any>(`${this.api}/delivery-slots/${id}`);
-}
-
-createDeliverySlot(data: any) {
-  return this.http.post(`${this.api}/delivery-slots`, data);
-}
-
-updateDeliverySlot(id: number, data: any) {
-  return this.http.put(`${this.api}/delivery-slots/${id}`, data);
-}
-
-deleteDeliverySlot(id: number) {
-  return this.http.delete(`${this.api}/delivery-slots/${id}`);
-}
-/* DRIVERS */
-getDrivers() {
-  return this.http.get<any[]>('http://localhost:5000/api/drivers');
-}
-
-getDriverById(id: number) {
-  return this.http.get<any>(`http://localhost:5000/api/drivers/${id}`);
-}
-
-createDriver(data: any) {
-  return this.http.post('http://localhost:5000/api/drivers', data);
-}
-
-updateDriver(id: number, data: any) {
-  return this.http.put(`http://localhost:5000/api/drivers/${id}`, data);
-}
-
-deleteDriver(id: number) {
-  return this.http.delete(`http://localhost:5000/api/drivers/${id}`);
-}
-/* DELIVERY */
-getDeliveryList() {
-  return this.http.get<any[]>(
-    'http://localhost:5000/api/delivery/products'
-  );
-}
-
-assignDelivery(id: number, data: any) {
-  return this.http.put(
-    `http://localhost:5000/api/delivery/assign/${id}`,
-    data
-  );
-}
-/* ================= LOGISTICS ================= */
-
-/* Assign (Create) Logistics */
-assignLogistics(data: any) {
-  return this.http.post(
-    `${this.api}/logistics`,
-    data
-  );
-}
-
-/* Get Logistics List */
-getLogisticsList() {
-  return this.http.get<any[]>(
-    `${this.api}/logistics`
-  );
-}
-
-/* Get Logistics By ID (Edit / View) */
-getLogisticsById(id: number) {
-  return this.http.get<any>(
-    `${this.api}/logistics/${id}`
-  );
-}
-
-/* ✅ UPDATE LOGISTICS (FIX FOR YOUR ERROR) */
-updateLogistics(id: number, data: any) {
-  return this.http.put(
-    `${this.api}/logistics/${id}`,
-    data
-  );
-}
-
-/* Delete Logistics */
-deleteLogistics(id: number) {
-  return this.http.delete(
-    `${this.api}/logistics/${id}`
-  );
-}
-
-/* Tracking Cards */
-getLogisticsTracking() {
-  return this.http.get<any[]>(
-    `${this.api}/logistics/tracking`
-  );
-}
 }

@@ -22,10 +22,12 @@ import { ProductListComponent } from './products/product-list.component';
 /* Delivery */
 import { DeliveryListComponent } from './delivery/delivery-list.component';
 import { DeliveryFormComponent } from './delivery/delivery-form.component';
-/* Delivery Slots*/
+
+/* Delivery Slots */
 import { DeliverySlotListComponent } from './delivery/delivery-slot-list.component';
 import { DeliverySlotCreateComponent } from './delivery/delivery-slot-create.component';
-/*Drivers */
+
+/* Drivers */
 import { DriverListComponent } from './drivers/driver-list.component';
 import { DriverFormComponent } from './drivers/driver-form.component';
 
@@ -45,74 +47,58 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
 
-      /* Warehouses */
+      /* ===== WAREHOUSES ===== */
       { path: 'warehouses', component: WarehouseListComponent },
       { path: 'warehouses/create', component: WarehouseCreateComponent },
 
-      /* Zones */
+      /* ===== ZONES ===== */
       { path: 'zones', component: ZonesListComponent },
       { path: 'zones/create', component: ZonesCreateComponent },
 
-      /* Products */
+      /* ===== PRODUCTS ===== */
       { path: 'products', component: ProductListComponent },
       { path: 'products/create', component: ProductEntryComponent },
       { path: 'products/edit/:id', component: ProductEntryComponent },
       { path: 'products/view/:id', component: ProductEntryComponent },
 
-      /* Delivery */
+      /* ===== DELIVERY ===== */
       { path: 'delivery', component: DeliveryListComponent },
-      /* Delivery Slots */
+      { path: 'delivery/edit/:id', component: DeliveryFormComponent },
+      { path: 'delivery/view/:id', component: DeliveryFormComponent },
+
+      /* ===== DELIVERY SLOTS ===== */
       { path: 'delivery-slots', component: DeliverySlotListComponent },
       { path: 'delivery-slots/create', component: DeliverySlotCreateComponent },
       { path: 'delivery-slots/edit/:id', component: DeliverySlotCreateComponent },
       { path: 'delivery-slots/view/:id', component: DeliverySlotCreateComponent },
-      /* ================= DELIVERY ================= */
-{ path: 'delivery', component: DeliveryListComponent },
-{ path: 'delivery/view/:id', component: DeliveryFormComponent },
-{ path: 'delivery/edit/:id', component: DeliveryFormComponent },
-       /* ===== DRIVERS ===== */
-    { path: 'drivers', component: DriverListComponent },
-    { path: 'drivers/create', component: DriverFormComponent },
-    { path: 'drivers/edit/:id', component: DriverFormComponent },
-    { path: 'drivers/view/:id', component: DriverFormComponent },
-    /* ================= LOGISTICS ================= */
 
-{
-  path: 'logistics/list',
-  loadComponent: () =>
-    import('./logistics/logistics-list.component')
-      .then(m => m.LogisticsListComponent)
-},
+      /* ===== DRIVERS ===== */
+      { path: 'drivers', component: DriverListComponent },
+      { path: 'drivers/create', component: DriverFormComponent },
+      { path: 'drivers/edit/:id', component: DriverFormComponent },
+      { path: 'drivers/view/:id', component: DriverFormComponent },
 
-{
-  path: 'logistics/assign/:productId',
-  loadComponent: () =>
-    import('./logistics/logistics-assign.component')
-      .then(m => m.LogisticsAssignComponent)
-},
-
-{
-  path: 'logistics/view/:id',
-  loadComponent: () =>
-    import('./logistics/logistics-assign.component')
-      .then(m => m.LogisticsAssignComponent)
-},
-
-{
-  path: 'logistics/edit/:id',
-  loadComponent: () =>
-    import('./logistics/logistics-assign.component')
-      .then(m => m.LogisticsAssignComponent)
-},
-
-{
-  path: 'logistics/tracking',
-  loadComponent: () =>
-    import('./logistics/logistics-tracking.component')
-      .then(m => m.LogisticsTrackingComponent)
-},
-
-      /* Default dashboard route */
+      /* Logistics */
+// ✅ LOGISTICS (NO dashboard prefix here)
+    {
+      path: 'logistics',
+      loadComponent: () =>
+        import('./logistics/logistics-list.component')
+          .then(m => m.LogisticsListComponent)
+    },
+    {
+      path: 'logistics/edit/:id',
+      loadComponent: () =>
+        import('./logistics/logistics-entry.component')
+          .then(m => m.LogisticsEntryComponent)
+    },
+    {
+      path: 'logistics/view/:id',
+      loadComponent: () =>
+        import('./logistics/logistics-entry.component')
+          .then(m => m.LogisticsEntryComponent)
+    },
+      /* ===== DEFAULT DASHBOARD ===== */
       { path: '', redirectTo: 'warehouses', pathMatch: 'full' }
     ]
   },
