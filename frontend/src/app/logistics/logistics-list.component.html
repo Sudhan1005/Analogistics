@@ -12,107 +12,86 @@
         <div class="card-body table-responsive p-0">
           <table class="table table-bordered table-striped align-middle mb-0">
 
-            <thead class="table-dark">
-              <tr>
-                <th>#</th>
-                <th>Warehouse</th>
-                <th>Zone</th>
-                <th>Product</th>
-                <th>Type</th>
-                <th>Category</th>
-                <th>Qty</th>
-                <th>Delivery Date</th>
-                <th>Transport</th>
-                <th>Vehicle Type</th>
-                <th>Vehicle No</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
+  <thead class="table-dark">
+    <tr>
+      <th>#</th>
+      <th>Warehouse</th>
+      <th>Zone</th>
+      <th>Product</th>
+      <th>Type</th>
+      <th>Category</th>
+      <th>Qty</th>
+      <th>Delivery Date</th>
+      <th>Remaining Time</th>
+      <th>Transport</th>
+      <th>Vehicle Type</th>
+      <th>Vehicle No</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
 
-            <tbody *ngIf="list.length; else empty">
-              <tr *ngFor="let l of list; let i = index">
+  <!-- ✅ DATA ROWS -->
+  <tbody>
 
-                <td>{{ i + 1 }}</td>
-                <td>{{ l.warehouse_name }}</td>
-                <td>{{ l.zone_name }}</td>
-                <td>{{ l.product_name }}</td>
-                <td>{{ l.product_type }}</td>
-                <td>{{ l.product_category }}</td>
-                <td>{{ l.quantity }}</td>
-                <td>{{ l.delivery_date }}</td>
+<tr *ngFor="let l of logistics; index as i">
+  <td>{{ i + 1 }}</td>
+  <td>{{ l.warehouse_name }}</td>
+  <td>{{ l.zone_name }}</td>
+  <td>{{ l.product_name }}</td>
+  <td>{{ l.product_type }}</td>
+  <td>{{ l.product_category }}</td>
+  <td>{{ l.quantity }}</td>
 
-                <!-- Transport -->
-                <td>
-                  <select
-                    class="form-select"
-                    [(ngModel)]="l.transport_type"
-                    name="transport_{{i}}"
-                    [disabled]="l.logistics_id">
-                    <option value="">Select</option>
-                    <option *ngFor="let t of transportTypes" [value]="t">
-                      {{ t }}
-                    </option>
-                  </select>
-                </td>
+  <td>{{ l.delivery_date }}</td>
 
-                <!-- Vehicle Type -->
-                <td>
-                  <select
-                    class="form-select"
-                    [(ngModel)]="l.vehicle_type"
-                    name="vehicle_type_{{i}}"
-                    [disabled]="l.logistics_id">
-                    <option value="">Select</option>
-                    <option *ngFor="let v of vehicleTypes" [value]="v">
-                      {{ v }}
-                    </option>
-                  </select>
-                </td>
+  <td>
+    <span class="badge bg-info">
+      {{ getRemainingTime(l.delivery_date) }}
+    </span>
+  </td>
 
-                <!-- Vehicle No -->
-                <td>
-                  <input
-                    class="form-control"
-                    [(ngModel)]="l.vehicle_number"
-                    name="vehicle_no_{{i}}"
-                    [disabled]="l.logistics_id">
-                </td>
+  <td>{{ l.transport_type || '-' }}</td>
+  <td>{{ l.vehicle_type || '-' }}</td>
+  <td>{{ l.vehicle_number || '-' }}</td>
 
-                <!-- Status -->
-                <td>
-                  <span class="badge bg-dark">
-                    Out for Delivery
-                  </span>
-                </td>
+  <td>
+    <span class="badge bg-dark">
+      {{ l.status }}
+    </span>
+  </td>
 
-                <!-- Actions -->
-                <td>
-                  <!-- SAVE -->
-                 <button
-  *ngIf="!l.is_logistics_assigned"
-  class="btn btn-success btn-sm"
-  (click)="save(l)">
-  Save
-</button>
+<td class="text-center">
 
-<ng-container *ngIf="l.is_logistics_assigned">
-  <button class="btn btn-warning btn-sm me-1" (click)="edit(l.id)">Edit</button>
-  <button class="btn btn-info btn-sm me-1" (click)="view(l.id)">View</button>
-  <button class="btn btn-danger btn-sm" (click)="remove(l.id)">Delete</button>
-</ng-container>
-                </td>
+  <!-- VIEW -->
+  <button class="btn btn-primary"
+          (click)="view(l.product_id)">
+    <i class="bi bi-eye"></i>
+  </button>
 
-              </tr>
-            </tbody>
-          </table>
+  <!-- EDIT -->
+  <button class="btn btn-warning"
+          (click)="edit(l.product_id)">
+    <i class="bi bi-pencil"></i>
+  </button>
 
-          <ng-template #empty>
-            <div class="text-center text-danger py-4">
-              No logistics found
-            </div>
-          </ng-template>
+  <!-- DELETE -->
+  <button class="btn btn-danger"
+          (click)="remove(l.product_id)">
+    <i class="bi bi-trash"></i>
+  </button>
 
+</td>
+</tr>
+
+<tr *ngIf="logistics.length === 0">
+  <td colspan="14" class="text-center text-danger">
+    No logistics found
+  </td>
+</tr>
+
+</tbody>
+</table>
         </div>
       </div>
     </div>

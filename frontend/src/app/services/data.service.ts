@@ -126,43 +126,26 @@ export class DataService {
   // ✅ Logistics List
   // shows products whose status = "Out for Delivery"
   getLogisticsList(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.api}/logistics`);
-  }
+  return this.http.get<any[]>(`${this.api}/logistics`);
+}
+// ALWAYS NUMBER — NOT string
+getLogisticsById(id: number): Observable<any> {
+  return this.http.get<any>(`${this.api}/logistics/${id}`);
+}
 
-  // ✅ Get logistics data by product (Edit / View)
-  getLogisticsByProduct(productId: number): Observable<any> {
-    return this.http.get<any>(`${this.api}/logistics/${productId}`);
-  }
+updateLogistics(
+  productId: number,
+  payload: any
+): Observable<any> {
+  return this.http.put<any>(
+    `${this.api}/logistics/${productId}`,
+    payload
+  );
+}
 
-  // ✅ First time logistics assign
-  saveLogistics(payload: {
-    product_id: number;
-    transport_type: string;
-    vehicle_type: string;
-    vehicle_number: string;
-  }): Observable<any> {
-    return this.http.post<any>(`${this.api}/logistics`, payload);
-  }
-
-  // ✅ Update logistics (Edit)
-  updateLogistics(
-    productId: number,
-    payload: {
-      transport_type: string;
-      vehicle_type: string;
-      vehicle_number: string;
-    }
-  ): Observable<any> {
-    return this.http.put<any>(
-      `${this.api}/logistics/${productId}`,
-      payload
-    );
-  }
-
-  // ✅ Delete logistics
-  deleteLogistics(productId: number): Observable<any> {
-    return this.http.delete<any>(
-      `${this.api}/logistics/${productId}`
-    );
-  }
+deleteLogistics(productId: number): Observable<any> {
+  return this.http.delete<any>(
+    `${this.api}/logistics/${productId}`
+  );
+}
 }

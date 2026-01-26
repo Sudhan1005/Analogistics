@@ -662,30 +662,33 @@ def get_logistics_list():
             p.product_type,
             p.product_category,
             p.quantity,
-            p.delivery_date,
+
+            CONCAT(
+              p.delivery_date, ' ',
+              IFNULL(p.delivery_time, '00:00:00')
+            ) AS delivery_date,
 
             w.name AS warehouse_name,
             z.zone_name,
 
-            l.id AS logistics_id,
             l.transport_type,
             l.vehicle_type,
-            l.vehicle_number
+            l.vehicle_number,
 
+            p.status
         FROM warehouse_products p
-        JOIN warehouses w ON p.warehouse_id = w.id
+        LEFT JOIN warehouses w ON p.warehouse_id = w.id
         LEFT JOIN warehouse_zones z ON p.zone_id = z.id
         LEFT JOIN logistics_assignments l ON l.product_id = p.id
-
         WHERE p.status = 'Out for Delivery'
-        ORDER BY p.delivery_date ASC
+        ORDER BY p.id DESC
     """)
 
     data = cur.fetchall()
     cur.close()
     conn.close()
 
-    return jsonify(data), 200
+    return jsonify(data), 200 
 
 @app.route('/api/logistics', methods=['POST'])
 def save_logistics():
@@ -788,6 +791,61 @@ def delete_logistics(product_id):
 
     return jsonify({'message': 'Logistics deleted'}), 200
 
+@app.route('/api/delivery/out-for-delivery/<int:product_id>', methods=['PUT'])
+def mark_out_for_delivery(product_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE warehouse_products
+        SET status = 'Out for Delivery'
+        WHERE id = %s
+    """, (product_id,))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({'message': 'Moved to logistics'}), 200
+
+@app.route('/api/logistics/<int:product_id>', methods=['GET'])
+def get_logistics_by_id(product_id):
+    conn = get_db_connection()
+    cur = conn.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT 
+            wp.id AS product_id,
+            wp.warehouse_id,
+            w.name AS warehouse_name,
+            wp.zone_id,
+            z.zone_name,
+            wp.product_name,
+            wp.product_type,
+            wp.product_category,
+            wp.quantity,
+            wp.delivery_date,
+            la.transport_type,
+            la.vehicle_type,
+            la.vehicle_number,
+            wp.status
+        FROM warehouse_products wp
+        LEFT JOIN warehouses w ON w.id = wp.warehouse_id
+        LEFT JOIN zones z ON z.id = wp.zone_id
+        LEFT JOIN logistics_assignments la ON la.product_id = wp.id
+        WHERE wp.id = %s
+          AND wp.status IN ('Logistics Ongoing', 'Out for Delivery')
+    """, (product_id,))
+
+    row = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    if not row:
+        return jsonify(None), 200   # 🔥 IMPORTANT (not [])
+
+    return jsonify(row), 200
 # ---------------- RUN ----------------
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,25 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router,RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { DataService } from '../services/data.service';
 
 @Component({
-  standalone: true,
   selector: 'app-logistics-list',
-  templateUrl: './logistics-list.component.html',
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule   // 🚨 REQUIRED
-  ]
+  standalone: true,                        // 🔥 REQUIRED
+  imports: [CommonModule, RouterModule],   // 🔥 REQUIRED
+  templateUrl: './logistics-list.component.html'
 })
-export class LogisticsListComponent implements OnInit {
+export class LogisticsListComponent implements OnInit, OnDestroy {
 
-  list: any[] = [];
-
-  transportTypes = ['Roadways', 'Railways', 'Airways', 'Seaways'];
-  vehicleTypes = ['Truck', 'Van', 'Container', 'Mini Truck','train'];
+  logistics: any[] = [];
+  private timer: any;
 
   constructor(
     private dataService: DataService,
@@ -27,72 +20,66 @@ export class LogisticsListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.load();
+    this.loadLogistics();
+
+    // live remaining time refresh
+    this.timer = setInterval(() => {}, 1000);
   }
 
-  /* ================= LOAD LIST ================= */
-  load(): void {
-  this.dataService.getLogisticsList().subscribe({
-    next: res => {
-      console.log('LOGISTICS API RESPONSE:', res); // 👈 DEBUG
-      this.list = res.map(r => ({
-        ...r,
-        is_logistics_assigned: !!r.logistics_id
-      }));
-    },
-    error: err => console.error(err)
+  ngOnDestroy(): void {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+  }
+
+  loadLogistics(): void {
+  this.dataService.getLogisticsList()
+    .subscribe(res => this.logistics = res || []);
+}
+
+  /* REMAINING TIME */
+  getRemainingTime(deliveryDate: string): string {
+    if (!deliveryDate) return '-';
+
+    const diff = new Date(deliveryDate).getTime() - Date.now();
+    if (diff <= 0) return 'Expired';
+
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
+
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  }
+
+  /* ACTIONS */
+view(id: number): void {
+  if (!id) {
+    console.error('View clicked with invalid id', id);
+    return;
+  }
+  this.router.navigate(['/dashboard/logistics/view', id]);
+}
+
+edit(id: number): void {
+  if (!id) {
+    console.error('Edit clicked with invalid id', id);
+    return;
+  }
+  this.router.navigate(['/dashboard/logistics/edit', id]);
+}
+
+remove(id: number): void {
+  if (!id) {
+    console.error('Delete clicked with invalid id', id);
+    return;
+  }
+
+  if (!confirm('Are you sure you want to delete this logistics?')) return;
+
+  this.dataService.deleteLogistics(id).subscribe(() => {
+    alert('Logistics deleted');
+    this.loadLogistics();
   });
 }
-  /* ================= SAVE (FIRST TIME) ================= */
-  save(l: any): void {
-
-    if (!l.transport_type || !l.vehicle_type || !l.vehicle_number) {
-      alert('Please fill Transport, Vehicle Type and Vehicle Number');
-      return;
-    }
-
-    const payload = {
-      product_id: l.id,            // 🔑 VERY IMPORTANT
-      transport_type: l.transport_type,
-      vehicle_type: l.vehicle_type,
-      vehicle_number: l.vehicle_number
-    };
-
-    this.dataService.saveLogistics(payload).subscribe({
-      next: () => {
-        alert('Logistics saved successfully');
-        this.load(); // refresh list
-      },
-      error: (err: any) => {
-        console.error(err);
-        alert('Save failed');
-      }
-    });
-  }
-
-  /* ================= ACTIONS ================= */
-  edit(productId: number): void {
-    this.router.navigate(['/dashboard/logistics/edit', productId]);
-  }
-
-  view(productId: number): void {
-    this.router.navigate(['/dashboard/logistics/view', productId]);
-  }
-
-  remove(productId: number): void {
-    if (!confirm('Delete logistics record?')) return;
-
-    this.dataService.deleteLogistics(productId).subscribe({
-      next: () => this.load(),
-      error: (err: any) => {
-        console.error(err);
-        alert('Delete failed');
-      }
-    });
-  }
-
-  /* ================= HELPERS ================= */
-  getStatusClass(): string {
-    return 'bg-dark';
-  }
 }

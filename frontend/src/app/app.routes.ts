@@ -30,7 +30,9 @@ import { DeliverySlotCreateComponent } from './delivery/delivery-slot-create.com
 /* Drivers */
 import { DriverListComponent } from './drivers/driver-list.component';
 import { DriverFormComponent } from './drivers/driver-form.component';
-
+/*Logistics*/
+import { LogisticsListComponent } from './logistics/logistics-list.component';
+import { LogisticsEntryComponent } from './logistics/logistics-entry.component';
 /* Guard */
 import { AuthGuard } from './guards/auth.guard';
 
@@ -78,26 +80,46 @@ export const routes: Routes = [
       { path: 'drivers/edit/:id', component: DriverFormComponent },
       { path: 'drivers/view/:id', component: DriverFormComponent },
 
-      /* Logistics */
-// ✅ LOGISTICS (NO dashboard prefix here)
-    {
-      path: 'logistics',
-      loadComponent: () =>
-        import('./logistics/logistics-list.component')
-          .then(m => m.LogisticsListComponent)
-    },
-    {
-      path: 'logistics/edit/:id',
-      loadComponent: () =>
-        import('./logistics/logistics-entry.component')
-          .then(m => m.LogisticsEntryComponent)
-    },
-    {
-      path: 'logistics/view/:id',
-      loadComponent: () =>
-        import('./logistics/logistics-entry.component')
-          .then(m => m.LogisticsEntryComponent)
-    },
+    // =========================
+  // LOGISTICS LIST
+  // =========================
+  {
+    path: 'logistics',
+    component: LogisticsListComponent
+  },
+
+  // =========================
+  // LOGISTICS VIEW
+  // =========================
+  {
+    path: 'logistics/view/:id',
+    component: LogisticsEntryComponent
+  },
+
+  // =========================
+  // LOGISTICS EDIT
+  // =========================
+  {
+    path: 'logistics/edit/:id',
+    component: LogisticsEntryComponent
+  },
+
+  // =========================
+  // DEFAULT ROUTE
+  // =========================
+  {
+    path: '',
+    redirectTo: 'logistics',
+    pathMatch: 'full'
+  },
+
+  // =========================
+  // FALLBACK ROUTE
+  // =========================
+  {
+    path: '**',
+    redirectTo: 'logistics'
+  },
       /* ===== DEFAULT DASHBOARD ===== */
       { path: '', redirectTo: 'warehouses', pathMatch: 'full' }
     ]

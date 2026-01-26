@@ -1,50 +1,95 @@
-<div class="warehouse-bg d-flex justify-content-center align-items-center">
-  <div class="card p-4 shadow" style="width:650px">
+<div class="warehouse-bg">
+  <div class="warehouse-content d-flex justify-content-center align-items-center">
 
-    <h4 class="mb-3 text-center">
-      {{ mode === 'view' ? 'View Logistics' : 'Edit Logistics' }}
-    </h4>
+    <!-- 🔥 ONLY ONE CONDITION -->
+    <div *ngIf="logistics" class="warehouse-card shadow" style="max-width: 1000px; width: 100%;">
+      <h4 class="text-center mb-4">
+        {{ isEdit ? 'Edit Logistics' : 'View Logistics' }}
+      </h4>
 
-    <div class="mb-2">
-      <label>Product</label>
-      <input class="form-control" [value]="data.product_name" disabled>
+      <form>
+
+        <div class="mb-3">
+          <label>Warehouse</label>
+          <select class="form-select"
+                  [(ngModel)]="logistics.warehouse_id"
+                  name="warehouse_id"
+                  (change)="onWarehouseChange()"
+                  [disabled]="isView">
+            <option *ngFor="let w of warehouses" [value]="w.id">
+              {{ w.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label>Zone</label>
+          <select class="form-select"
+                  [(ngModel)]="logistics.zone_id"
+                  name="zone_id"
+                  [disabled]="isView">
+            <option *ngFor="let z of zones" [value]="z.id">
+              {{ z.zone_name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label>Product</label>
+            <input class="form-control" [value]="logistics.product_name" disabled>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label>Type</label>
+            <input class="form-control" [value]="logistics.product_type" disabled>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label>Category</label>
+            <input class="form-control" [value]="logistics.product_category" disabled>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label>Quantity</label>
+          <input type="number" class="form-control"
+                 [(ngModel)]="logistics.quantity"
+                 name="quantity"
+                 [disabled]="isView">
+        </div>
+
+        <div class="mb-3">
+          <label>Delivery Date</label>
+          <input type="date" class="form-control"
+                 [(ngModel)]="deliveryDate"
+                 name="deliveryDate"
+                 [disabled]="isView">
+        </div>
+
+        <div class="mb-3">
+          <label>Delivery Time</label>
+          <input type="time" class="form-control"
+                 [(ngModel)]="deliveryTime"
+                 name="deliveryTime"
+                 [disabled]="isView">
+        </div>
+
+        <div class="mb-4">
+          <label>Status</label>
+          <select class="form-select"
+                  [(ngModel)]="logistics.status"
+                  name="status"
+                  [disabled]="isView">
+            <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+
+        <div class="text-center">
+          <button *ngIf="isEdit" class="btn btn-primary" type="button" (click)="update()">Update</button>
+          <button class="btn btn-secondary ms-2" type="button" (click)="back()">Back</button>
+        </div>
+
+      </form>
     </div>
-
-    <div class="mb-2">
-      <label>Driver</label>
-      <input class="form-control" [value]="data.driver_name" disabled>
-    </div>
-
-    <div class="mb-2">
-      <label>Transport Type</label>
-      <select class="form-select"
-              [(ngModel)]="data.transport_type"
-              [disabled]="mode==='view'">
-        <option *ngFor="let t of transportTypes">{{ t }}</option>
-      </select>
-    </div>
-
-    <div class="mb-2">
-      <label>Vehicle Type</label>
-      <select class="form-select"
-              [(ngModel)]="data.vehicle_type"
-              [disabled]="mode==='view'">
-        <option *ngFor="let v of vehicleTypes">{{ v }}</option>
-      </select>
-    </div>
-
-    <div class="mb-3">
-      <label>Vehicle Number</label>
-      <input class="form-control"
-             [(ngModel)]="data.vehicle_number"
-             [disabled]="mode==='view'">
-    </div>
-
-    <button *ngIf="mode==='edit'"
-            class="btn btn-primary w-100"
-            (click)="save()">
-      Save
-    </button>
 
   </div>
 </div>
