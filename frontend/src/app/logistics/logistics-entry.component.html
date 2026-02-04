@@ -1,14 +1,17 @@
 <div class="warehouse-bg">
   <div class="warehouse-content d-flex justify-content-center align-items-center">
 
-    <!-- 🔥 ONLY ONE CONDITION -->
-    <div *ngIf="logistics" class="warehouse-card shadow" style="max-width: 1000px; width: 100%;">
+    <div class="warehouse-card shadow"
+         style="max-width: 1000px; width: 100%;">
+
       <h4 class="text-center mb-4">
         {{ isEdit ? 'Edit Logistics' : 'View Logistics' }}
       </h4>
 
-      <form>
+      <!-- RENDER ONLY WHEN DATA IS READY -->
+      <form *ngIf="logistics">
 
+        <!-- WAREHOUSE -->
         <div class="mb-3">
           <label>Warehouse</label>
           <select class="form-select"
@@ -16,79 +19,149 @@
                   name="warehouse_id"
                   (change)="onWarehouseChange()"
                   [disabled]="isView">
-            <option *ngFor="let w of warehouses" [value]="w.id">
+            <option *ngFor="let w of warehouses"
+                    [value]="w.id">
               {{ w.name }}
             </option>
           </select>
         </div>
 
+        <!-- ZONE -->
         <div class="mb-3">
           <label>Zone</label>
           <select class="form-select"
                   [(ngModel)]="logistics.zone_id"
                   name="zone_id"
                   [disabled]="isView">
-            <option *ngFor="let z of zones" [value]="z.id">
-              {{ z.zone_name }}
+            <option *ngFor="let z of zones"
+                    [value]="z.id">
+              {{ z.zone_name }} ({{ z.zone_type }})
             </option>
           </select>
         </div>
 
+        <!-- PRODUCT DETAILS -->
         <div class="row">
-          <div class="col-md-4 mb-3">
-            <label>Product</label>
-            <input class="form-control" [value]="logistics.product_name" disabled>
+          <div class="col-md-6 mb-3">
+            <label>Product Name</label>
+            <input class="form-control"
+                   [(ngModel)]="logistics.product_name"
+                   name="product_name"
+                   [disabled]="isView">
           </div>
-          <div class="col-md-4 mb-3">
-            <label>Type</label>
-            <input class="form-control" [value]="logistics.product_type" disabled>
+
+          <div class="col-md-3 mb-3">
+            <label>Product Type</label>
+            <input class="form-control"
+                   [(ngModel)]="logistics.product_type"
+                   name="product_type"
+                   [disabled]="isView">
           </div>
-          <div class="col-md-4 mb-3">
-            <label>Category</label>
-            <input class="form-control" [value]="logistics.product_category" disabled>
+
+          <div class="col-md-3 mb-3">
+            <label>Product Category</label>
+            <input class="form-control"
+                   [(ngModel)]="logistics.product_category"
+                   name="product_category"
+                   [disabled]="isView">
           </div>
         </div>
 
+        <!-- QUANTITY -->
         <div class="mb-3">
           <label>Quantity</label>
-          <input type="number" class="form-control"
+          <input type="number"
+                 class="form-control"
                  [(ngModel)]="logistics.quantity"
                  name="quantity"
                  [disabled]="isView">
         </div>
 
-        <div class="mb-3">
-          <label>Delivery Date</label>
-          <input type="date" class="form-control"
-                 [(ngModel)]="deliveryDate"
-                 name="deliveryDate"
-                 [disabled]="isView">
+        <!-- DELIVERY DATE & TIME -->
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>Delivery Date</label>
+            <input type="date"
+                   class="form-control"
+                   [(ngModel)]="logistics.delivery_date"
+                   name="delivery_date"
+                   [disabled]="isView">
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label>Delivery Time</label>
+            <input type="time"
+                   class="form-control"
+                   [(ngModel)]="logistics.delivery_time"
+                   name="delivery_time"
+                   [disabled]="isView">
+          </div>
         </div>
 
-        <div class="mb-3">
-          <label>Delivery Time</label>
-          <input type="time" class="form-control"
-                 [(ngModel)]="deliveryTime"
-                 name="deliveryTime"
-                 [disabled]="isView">
+        <!-- TRANSPORT -->
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label>Transport Type</label>
+            <select class="form-select"
+                    [(ngModel)]="logistics.transport_type"
+                    name="transport_type"
+                    [disabled]="isView">
+              <option *ngFor="let t of transportTypes"
+                      [value]="t">
+                {{ t }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label>Vehicle Type</label>
+            <input class="form-control"
+                   [(ngModel)]="logistics.vehicle_type"
+                   name="vehicle_type"
+                   [disabled]="isView">
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label>Vehicle Number</label>
+            <input class="form-control"
+                   [(ngModel)]="logistics.vehicle_number"
+                   name="vehicle_number"
+                   [disabled]="isView">
+          </div>
         </div>
 
+        <!-- STATUS -->
         <div class="mb-4">
           <label>Status</label>
           <select class="form-select"
                   [(ngModel)]="logistics.status"
                   name="status"
                   [disabled]="isView">
-            <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+            <option *ngFor="let s of statuses"
+                    [value]="s">
+              {{ s }}
+            </option>
           </select>
         </div>
 
-        <div class="text-center">
-          <button *ngIf="isEdit" class="btn btn-primary" type="button" (click)="update()">Update</button>
-          <button class="btn btn-secondary ms-2" type="button" (click)="back()">Back</button>
+        <!-- ACTIONS -->
+        <div class="d-flex justify-content-center gap-3">
+          <button *ngIf="isEdit"
+                  class="btn btn-primary"
+                  type="button"
+                  (click)="update()">
+            Update
+          </button>
+
+          <button type="button"
+                  class="btn btn-secondary"
+                  (click)="back()">
+            Back
+          </button>
         </div>
 
       </form>
+
     </div>
 
   </div>

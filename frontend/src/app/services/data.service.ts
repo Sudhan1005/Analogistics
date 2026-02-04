@@ -123,29 +123,15 @@ export class DataService {
 
   /* ===================== LOGISTICS ===================== */
 
-  // ✅ Logistics List
-  // shows products whose status = "Out for Delivery"
-  getLogisticsList(): Observable<any[]> {
-  return this.http.get<any[]>(`${this.api}/logistics`);
+getLogisticsList(): Observable<any[]> {
+  return this.http.get<any>(`${this.api}/logistics`);
 }
-// ALWAYS NUMBER — NOT string
+
 getLogisticsById(id: number): Observable<any> {
   return this.http.get<any>(`${this.api}/logistics/${id}`);
 }
 
-updateLogistics(
-  productId: number,
-  payload: any
-): Observable<any> {
-  return this.http.put<any>(
-    `${this.api}/logistics/${productId}`,
-    payload
-  );
-}
-
-deleteLogistics(productId: number): Observable<any> {
-  return this.http.delete<any>(
-    `${this.api}/logistics/${productId}`
-  );
+updateLogistics(id: number, data: any): Observable<any> {
+  return this.http.put<any>(`${this.api}/logistics/${id}`, data);
 }
 }

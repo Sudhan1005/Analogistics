@@ -79,47 +79,18 @@ export const routes: Routes = [
       { path: 'drivers/create', component: DriverFormComponent },
       { path: 'drivers/edit/:id', component: DriverFormComponent },
       { path: 'drivers/view/:id', component: DriverFormComponent },
-
-    // =========================
-  // LOGISTICS LIST
-  // =========================
-  {
-    path: 'logistics',
-    component: LogisticsListComponent
-  },
-
-  // =========================
-  // LOGISTICS VIEW
-  // =========================
-  {
-    path: 'logistics/view/:id',
-    component: LogisticsEntryComponent
-  },
-
-  // =========================
-  // LOGISTICS EDIT
-  // =========================
-  {
-    path: 'logistics/edit/:id',
-    component: LogisticsEntryComponent
-  },
-
-  // =========================
-  // DEFAULT ROUTE
-  // =========================
-  {
-    path: '',
-    redirectTo: 'logistics',
-    pathMatch: 'full'
-  },
-
-  // =========================
-  // FALLBACK ROUTE
-  // =========================
-  {
-    path: '**',
-    redirectTo: 'logistics'
-  },
+      {
+  path: 'logistics',
+  component: LogisticsListComponent
+},
+{
+  path: 'logistics/edit/:id',
+  component: LogisticsEntryComponent
+},
+{
+  path: 'logistics/view/:id',
+  component: LogisticsEntryComponent
+},
       /* ===== DEFAULT DASHBOARD ===== */
       { path: '', redirectTo: 'warehouses', pathMatch: 'full' }
     ]

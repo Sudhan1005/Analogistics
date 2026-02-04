@@ -4,95 +4,70 @@
     <div class="container-fluid">
       <div class="warehouse-card shadow">
 
-        <!-- HEADER -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h4 class="mb-0">Logistics List</h4>
+        <h4 class="mb-3">Logistics List</h4>
+
+        <div *ngIf="loading" class="text-center py-4">
+          Loading logistics...
         </div>
 
-        <div class="card-body table-responsive p-0">
-          <table class="table table-bordered table-striped align-middle mb-0">
+        <div *ngIf="!loading" class="table-responsive">
+          <table class="table table-bordered table-hover table-sm text-nowrap">
 
-  <thead class="table-dark">
-    <tr>
-      <th>#</th>
-      <th>Warehouse</th>
-      <th>Zone</th>
-      <th>Product</th>
-      <th>Type</th>
-      <th>Category</th>
-      <th>Qty</th>
-      <th>Delivery Date</th>
-      <th>Remaining Time</th>
-      <th>Transport</th>
-      <th>Vehicle Type</th>
-      <th>Vehicle No</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Warehouse</th>
+                <th>Zone</th>
+                <th>Product</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Qty</th>
+                <th>Delivery Date</th>
+                <th>Transport</th>
+                <th>Vehicle</th>
+                <th>Status</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
 
-  <!-- ✅ DATA ROWS -->
-  <tbody>
+            <tbody>
+              <tr *ngFor="let l of logistics; index as i">
+                <td>{{ i + 1 }}</td>
+                <td>{{ l.warehouse_name }}</td>
+                <td>{{ l.zone_name }}</td>
+                <td>{{ l.product_name }}</td>
+                <td>{{ l.product_type }}</td>
+                <td>{{ l.product_category }}</td>
+                <td>{{ l.quantity }}</td>
+                <td>{{ l.delivery_date }}</td>
+                <td>{{ l.transport_type }}</td>
+                <td>{{ l.vehicle_number }}</td>
 
-<tr *ngFor="let l of logistics; index as i">
-  <td>{{ i + 1 }}</td>
-  <td>{{ l.warehouse_name }}</td>
-  <td>{{ l.zone_name }}</td>
-  <td>{{ l.product_name }}</td>
-  <td>{{ l.product_type }}</td>
-  <td>{{ l.product_category }}</td>
-  <td>{{ l.quantity }}</td>
+                <td>
+                  <span class="badge bg-info">{{ l.status }}</span>
+                </td>
 
-  <td>{{ l.delivery_date }}</td>
+                <td class="text-center">
+                  <i class="bi bi-eye-fill text-info me-2"
+                     role="button"
+                     (click)="view(l.id)"></i>
 
-  <td>
-    <span class="badge bg-info">
-      {{ getRemainingTime(l.delivery_date) }}
-    </span>
-  </td>
+                  <i class="bi bi-pencil-fill text-warning"
+                     role="button"
+                     (click)="edit(l.id)"></i>
+                </td>
+              </tr>
 
-  <td>{{ l.transport_type || '-' }}</td>
-  <td>{{ l.vehicle_type || '-' }}</td>
-  <td>{{ l.vehicle_number || '-' }}</td>
+              <tr *ngIf="logistics.length === 0">
+                <td colspan="12" class="text-center text-danger">
+                  No logistics found
+                </td>
+              </tr>
+            </tbody>
 
-  <td>
-    <span class="badge bg-dark">
-      {{ l.status }}
-    </span>
-  </td>
-
-<td class="text-center">
-
-  <!-- VIEW -->
-  <button class="btn btn-primary"
-          (click)="view(l.product_id)">
-    <i class="bi bi-eye"></i>
-  </button>
-
-  <!-- EDIT -->
-  <button class="btn btn-warning"
-          (click)="edit(l.product_id)">
-    <i class="bi bi-pencil"></i>
-  </button>
-
-  <!-- DELETE -->
-  <button class="btn btn-danger"
-          (click)="remove(l.product_id)">
-    <i class="bi bi-trash"></i>
-  </button>
-
-</td>
-</tr>
-
-<tr *ngIf="logistics.length === 0">
-  <td colspan="14" class="text-center text-danger">
-    No logistics found
-  </td>
-</tr>
-
-</tbody>
-</table>
+          </table>
         </div>
+
       </div>
     </div>
 
